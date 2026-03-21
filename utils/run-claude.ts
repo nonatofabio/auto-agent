@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { styleText } from "node:util";
 
 export function runClaude(
   systemPrompt: string,
@@ -38,12 +39,12 @@ export function runClaude(
                 process.stdout.write(block.text);
               } else if (block.type === "tool_use") {
                 console.log(
-                  `\n[tool] ${block.name}: ${JSON.stringify(block.input).slice(0, 200)}`
+                  `\n${styleText("magenta", `[tool] ${block.name}`)}: ${JSON.stringify(block.input).slice(0, 200)}`
                 );
               }
             }
           } else if (event.type === "result") {
-            console.log("\n[done]", event.subtype ?? "");
+            console.log(styleText("green", `\n[done] ${event.subtype ?? ""}`));
           }
         } catch {
           // not valid JSON, skip

@@ -1,4 +1,4 @@
-import { parseArgs } from "node:util";
+import { parseArgs, styleText } from "node:util";
 import { mkdir, copyFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { existsSync } from "node:fs";
@@ -11,7 +11,9 @@ const { values } = parseArgs({
 });
 
 if (!values.id) {
-  console.error("Usage: node scripts/create-job.ts --id <job-id>");
+  console.error(
+    styleText("red", "Usage: node scripts/create-job.ts --id <job-id>")
+  );
   process.exit(1);
 }
 
@@ -20,7 +22,9 @@ const projectRoot: string = resolve(import.meta.dirname, "..");
 const jobDir: string = join(projectRoot, "jobs", jobId);
 
 if (existsSync(jobDir)) {
-  console.error(`Error: Job folder already exists at ${jobDir}`);
+  console.error(
+    styleText("red", `Error: Job folder already exists at ${jobDir}`)
+  );
   process.exit(1);
 }
 
@@ -39,14 +43,14 @@ await copyFile(
   join(jobDir, "MEMORY.md")
 );
 
-console.log(`Job "${jobId}" created at: ${jobDir}`);
+console.log(styleText("green", `Job "${jobId}" created at: ${jobDir}`));
 console.log();
-console.log("Created:");
-console.log(`  ${join(jobDir, "JOB.md")}           — fill in job config`);
-console.log(`  ${join(jobDir, "MEMORY.md")}        — optionally seed with prior knowledge`);
-console.log(`  ${join(jobDir, "hypotheses/")}      — hypothesis folders will go here`);
+console.log(styleText("bold", "Created:"));
+console.log(`  ${styleText("cyan", join(jobDir, "JOB.md"))}           — fill in job config`);
+console.log(`  ${styleText("cyan", join(jobDir, "MEMORY.md"))}        — optionally seed with prior knowledge`);
+console.log(`  ${styleText("cyan", join(jobDir, "hypotheses/"))}      — hypothesis folders will go here`);
 console.log();
-console.log("Next steps:");
-console.log(`  1. Open ${join(jobDir, "JOB.md")} and fill in the job details`);
-console.log(`  2. Optionally seed ${join(jobDir, "MEMORY.md")} with prior knowledge`);
-console.log(`  3. Run: npm run run-job -- --id ${jobId}`);
+console.log(styleText("bold", "Next steps:"));
+console.log(`  1. Open ${styleText("cyan", join(jobDir, "JOB.md"))} and fill in the job details`);
+console.log(`  2. Optionally seed ${styleText("cyan", join(jobDir, "MEMORY.md"))} with prior knowledge`);
+console.log(`  3. Run: ${styleText("yellow", `npm run run-job -- --id ${jobId}`)}`);

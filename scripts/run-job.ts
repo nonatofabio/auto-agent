@@ -1,4 +1,4 @@
-import { parseArgs } from "node:util";
+import { parseArgs, styleText } from "node:util";
 import { readFile, copyFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { existsSync } from "node:fs";
@@ -20,7 +20,7 @@ const { values } = parseArgs({
 
 if (!values.id) {
   console.error(
-    "Usage: npm run run-job -- --id <job-id> [--max-iterations <n>]"
+    styleText("red", "Usage: npm run run-job -- --id <job-id> [--max-iterations <n>]")
   );
   process.exit(1);
 }
@@ -31,8 +31,8 @@ const projectRoot = resolve(import.meta.dirname, "..");
 const jobDir = join(projectRoot, "jobs", jobId);
 
 if (!existsSync(jobDir)) {
-  console.error(`Error: Job folder not found at ${jobDir}`);
-  console.error(`Run: npm run create-job -- --id ${jobId}`);
+  console.error(styleText("red", `Error: Job folder not found at ${jobDir}`));
+  console.error(`Run: ${styleText("yellow", `npm run create-job -- --id ${jobId}`)}`);
   process.exit(1);
 }
 
@@ -46,7 +46,7 @@ const branchMatch = jobMd.match(/\*\*Branch\*\*:\s*(.+)/);
 
 if (!pathMatch || !branchMatch) {
   console.error(
-    "Error: Could not parse Target Repository path or branch from JOB.md"
+    styleText("red", "Error: Could not parse Target Repository path or branch from JOB.md")
   );
   process.exit(1);
 }
@@ -56,7 +56,7 @@ const baseBranch = branchMatch[1].trim();
 const targetRepoPath = resolve(jobDir, targetRepoRelative);
 
 if (!existsSync(targetRepoPath)) {
-  console.error(`Error: Target repo not found at ${targetRepoPath}`);
+  console.error(styleText("red", `Error: Target repo not found at ${targetRepoPath}`));
   process.exit(1);
 }
 
@@ -75,7 +75,7 @@ const baselineDir = join(jobDir, "hypotheses", "000-baseline");
 const baselineBranch = `${jobId}-baseline`;
 
 if (!existsSync(baselineDir)) {
-  console.log("Baseline not found. Running baseline evals...\n");
+  console.log(styleText("yellow", "Baseline not found. Running baseline evals...\n"));
   await runBaselineEvals({
     jobId,
     jobDir,
@@ -92,7 +92,7 @@ if (!existsSync(baselineDir)) {
 const baselineReportPath = join(baselineDir, "REPORT.md");
 if (!existsSync(baselineReportPath)) {
   console.error(
-    `Error: Baseline REPORT.md not found at ${baselineReportPath}`
+    styleText("red", `Error: Baseline REPORT.md not found at ${baselineReportPath}`)
   );
   process.exit(1);
 }
@@ -128,10 +128,10 @@ function parseAccuracy(reportContent: string): string {
 let bestBranch = baselineBranch;
 const reportTemplatePath = join(projectRoot, "templates", "REPORT-TEMPLATE.md");
 
-console.log(`Starting optimization loop for job "${jobId}"`);
-console.log(`Max iterations: ${maxIterations}`);
-console.log(`Target repo: ${targetRepoPath}`);
-console.log(`Best branch: ${bestBranch}`);
+console.log(styleText("bold", `Starting optimization loop for job "${jobId}"`));
+console.log(`  Max iterations: ${styleText("cyan", String(maxIterations))}`);
+console.log(`  Target repo:    ${styleText("cyan", targetRepoPath)}`);
+console.log(`  Best branch:    ${styleText("cyan", bestBranch)}`);
 console.log();
 
 for (let i = 0; i < maxIterations; i++) {
@@ -140,9 +140,9 @@ for (let i = 0; i < maxIterations; i++) {
   const hypId = `${seq}-${hexId}`;
   const hypBranch = `${jobId}-hyp-${hypId}`;
 
-  console.log(`\n${"=".repeat(60)}`);
-  console.log(`[iteration ${i + 1}/${maxIterations}] Starting hypothesis ${hypId}`);
-  console.log(`${"=".repeat(60)}\n`);
+  console.log(`\n${styleText("cyan", "=".repeat(60))}`);
+  console.log(styleText("bold", `[iteration ${i + 1}/${maxIterations}] Starting hypothesis ${hypId}`));
+  console.log(`${styleText("cyan", "=".repeat(60))}\n`);
 
   // Create hypothesis folder
   const hypothesis = await createHypothesis({
@@ -223,12 +223,12 @@ ${jobMd}`;
   const reportPath = join(hypothesis.dir, "REPORT.md");
 
   if (exitCode !== 0) {
-    console.error(`\nClaude Code exited with code ${exitCode}.`);
+    console.error(styleText("red", `\nClaude Code exited with code ${exitCode}.`));
     process.exit(1);
   }
 
   if (!existsSync(reportPath)) {
-    console.error(`\nREPORT.md not found at ${reportPath}.`);
+    console.error(styleText("red", `\nREPORT.md not found at ${reportPath}.`));
     process.exit(1);
   }
 
@@ -238,7 +238,7 @@ ${jobMd}`;
 
   if (!decision) {
     console.error(
-      `\nNo valid **Decision: CONTINUE** or **Decision: ROLLBACK** found in ${reportPath}.`
+      styleText("red", `\nNo valid **Decision: CONTINUE** or **Decision: ROLLBACK** found in ${reportPath}.`)
     );
     process.exit(1);
   }
@@ -261,14 +261,15 @@ ${jobMd}`;
   }
 
   // Print summary
-  console.log(`\n${"—".repeat(60)}`);
+  const decisionColor = decision === "CONTINUE" ? "green" : "red";
+  console.log(`\n${styleText("cyan", "—".repeat(60))}`);
   console.log(
-    `[iteration ${i + 1}/${maxIterations}] Hypothesis ${hypId}: ${decision} | Accuracy: ${accuracy}`
+    `${styleText("bold", `[iteration ${i + 1}/${maxIterations}]`)} Hypothesis ${hypId}: ${styleText(decisionColor, decision)} | Accuracy: ${styleText("yellow", accuracy)}`
   );
-  console.log(`Best branch: ${bestBranch}`);
-  console.log(`${"—".repeat(60)}\n`);
+  console.log(`Best branch: ${styleText("cyan", bestBranch)}`);
+  console.log(`${styleText("cyan", "—".repeat(60))}\n`);
 }
 
-console.log("\nOptimization loop complete.");
-console.log(`Final best branch: ${bestBranch}`);
-console.log(`Job artifacts: ${jobDir}`);
+console.log(styleText("green", "\nOptimization loop complete."));
+console.log(`Final best branch: ${styleText("bold", bestBranch)}`);
+console.log(`Job artifacts:     ${styleText("cyan", jobDir)}`);

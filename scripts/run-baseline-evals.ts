@@ -1,6 +1,7 @@
 import { copyFile } from "node:fs/promises";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
+import { styleText } from "node:util";
 import { createHypothesis } from "../utils/create-hypothesis.ts";
 import { runClaude } from "../utils/run-claude.ts";
 
@@ -26,20 +27,20 @@ export async function runBaselineEvals(options: RunBaselineOptions) {
     }).trim();
   }
 
-  console.log(`Checking out base branch "${baseBranch}" in target repo...`);
+  console.log(`Checking out base branch ${styleText("cyan", `"${baseBranch}"`)} in target repo...`);
   const currentBranch = git("rev-parse", "--abbrev-ref", "HEAD");
   if (currentBranch !== baseBranch) {
     git("checkout", baseBranch);
   }
-  console.log(`On branch: ${git("rev-parse", "--abbrev-ref", "HEAD")}`);
+  console.log(`On branch: ${styleText("cyan", git("rev-parse", "--abbrev-ref", "HEAD"))}`);
 
-  console.log(`Switching to branch "${baselineBranch}"...`);
+  console.log(`Switching to branch ${styleText("cyan", `"${baselineBranch}"`)}...`);
   try {
     git("checkout", "-b", baselineBranch);
   } catch {
     git("checkout", baselineBranch);
   }
-  console.log(`On branch: ${git("rev-parse", "--abbrev-ref", "HEAD")}`);
+  console.log(`On branch: ${styleText("cyan", git("rev-parse", "--abbrev-ref", "HEAD"))}`);
 
   const hypothesis = await createHypothesis({
     jobDir,
@@ -52,8 +53,8 @@ export async function runBaselineEvals(options: RunBaselineOptions) {
   const reportTemplatePath = join(projectRoot, "templates", "REPORT-TEMPLATE.md");
   await copyFile(reportTemplatePath, join(hypothesis.dir, "REPORT.md"));
 
-  console.log(`Created baseline hypothesis: ${hypothesis.dir}`);
-  console.log(`Spawning Claude Code to run baseline evals...`);
+  console.log(`Created baseline hypothesis: ${styleText("cyan", hypothesis.dir)}`);
+  console.log(styleText("bold", "Spawning Claude Code to run baseline evals..."));
   console.log();
 
   const systemPrompt = `You are an evaluation runner. You run evals on a target repository and update a structured report.
@@ -101,11 +102,11 @@ ${jobMd}`;
   );
 
   if (exitCode !== 0) {
-    console.error(`Claude Code exited with code ${exitCode}`);
+    console.error(styleText("red", `Claude Code exited with code ${exitCode}`));
     process.exit(exitCode);
   }
 
   console.log();
-  console.log("Baseline evals completed.");
-  console.log(`Report: ${hypothesis.dir}/REPORT.md`);
+  console.log(styleText("green", "Baseline evals completed."));
+  console.log(`Report: ${styleText("cyan", `${hypothesis.dir}/REPORT.md`)}`);
 }
