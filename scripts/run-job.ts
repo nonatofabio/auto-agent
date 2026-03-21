@@ -173,11 +173,11 @@ for (let i = 0; i < maxIterations; i++) {
 1. **Study the codebase first.** Read the agent's source code, understand its architecture, how it processes inputs, what tools it has, how the system prompt is structured, and how to modify it. Check the job configuration below for codebase overview and constraints.
 2. **Analyze failures.** Read the baseline report and job memory. Group failing eval cases by root cause — look for classes of errors (e.g., "all arithmetic fails because there's no calculator tool" rather than treating each case individually).
 3. **Formulate a hypothesis.** Target one class of failures (or a few related ones). Your hypothesis should be specific and testable: "Adding X will fix cases Y, Z because they all fail for reason W."
-4. **Implement the fix.** Make changes in the target repo. You can add tools, modify the system prompt, refactor logic, add dependencies, create helper functions — whatever the job configuration allows.
-5. **Debug and test.** Run the agent manually on a failing case if needed. Check that the project builds. Iterate on your fix until it works.
-6. **Run the full eval suite** using the eval command from the job configuration. Compare results to the baseline.
-7. **Avoid regressions.** If your change fixes some cases but breaks others that previously passed, investigate and fix the regression before finalizing. A net improvement with no regressions is the goal.
-8. **Fill in REPORT.md and update MEMORY.md.**
+4. **Implement the fix.** Make changes in the target repo. You can add tools, modify the system prompt, refactor logic, add dependencies, create helper functions — whatever the job configuration allows. Ensure the project builds before proceeding.
+5. **Run the full eval suite exactly once** using the eval command from the job configuration. Compare results to the baseline.
+6. **Fill in REPORT.md and update MEMORY.md.** Record the results as-is. Do NOT attempt further refinements.
+
+IMPORTANT: You get ONE shot per iteration. Make your changes, run evals once, then write the report and stop. Do NOT re-edit code and re-run evals trying to improve results within this iteration. If there are regressions or remaining failures, note them in the report — the next iteration will address them. Your job is to make a single, well-reasoned change and report the outcome honestly.
 
 ## Context
 - Target repository: ${targetRepoPath} (branch: "${hypBranch}")
@@ -194,11 +194,11 @@ for (let i = 0; i < maxIterations; i++) {
 
 VERIFY before finishing:
 1. No forbidden files were modified.
-2. The project builds and evals ran successfully.
+2. The project builds and evals ran exactly once.
 3. Every section of REPORT.md is filled in and the Recommendation ends with **Decision: CONTINUE** or **Decision: ROLLBACK**.
 4. MEMORY.md has been updated with learnings from this hypothesis.
 5. The hypothesis statement in REPORT.md is specific and testable — not vague.
-6. No previously passing eval cases now fail (no regressions).
+6. You did NOT re-edit code or re-run evals after the first eval run. One change, one eval, one report.
 
 ## Baseline Report
 ${baselineReport}
