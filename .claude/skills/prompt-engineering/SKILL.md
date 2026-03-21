@@ -1,11 +1,9 @@
 ---
 name: prompt-engineering
-description: "Rules and frameworks for writing high-quality LLM system prompts. Use this skill when authoring, reviewing, or optimizing a system prompt. Covers the Curse of Instructions formula (Harada et al., 2024), EARS syntax for unambiguous rules, the five structural failure patterns, and the ARQ VERIFY scaffold for multi-instruction compliance."
-metadata:
-  version: "1.0.0"
+description: "Rules and frameworks for writing high-quality LLM system prompts. Use this skill whenever you are authoring, reviewing, editing, or optimizing a system prompt — including when generating a system prompt as part of building an agent, tool, or workflow. Trigger on any task that involves writing instructions for an LLM, crafting a system message, tuning prompt wording, or reviewing an existing prompt for quality. Even if the user doesn't say 'system prompt' explicitly, use this skill when the output will be consumed as LLM instructions."
 ---
 
-# Prompt Engineering Rules
+# Prompt Engineering
 
 Reference for writing and reviewing LLM system prompts.
 Based on Harada et al. (2024) — [Curse of Instructions](https://openreview.net/forum?id=R6q67CDBCH), EARS syntax, and ARQ pattern.
@@ -23,7 +21,9 @@ The probability of the model following **all** rules simultaneously is approxima
 | 20      | 36%      | 12%      |
 | 30      | 21%      | 4%       |
 
-**Target: ≤ 10 distinct rules in the system prompt.**
+**Target: 10 or fewer distinct rules in the system prompt.**
+
+The math is unforgiving — every additional rule multiplicatively reduces the chance the model follows all of them. This is why minimizing rule count matters more than perfecting any single rule.
 
 - Move procedural/structural rules (e.g., parameter formatting, count constraints) into **tool descriptions**, not the system prompt.
 - Merge rules that protect the same invariant into one EARS statement.
@@ -33,7 +33,9 @@ The probability of the model following **all** rules simultaneously is approxima
 
 ## 2. Write Rules in EARS Syntax
 
-**Easy Approach to Requirements Syntax** — four forms, all unambiguous and testable.
+**Easy Approach to Requirements Syntax** produces unambiguous, testable rules. Free-form instructions invite misinterpretation because the model has to guess the scope and trigger condition. EARS removes that ambiguity.
+
+Four forms:
 
 | Form | Template | Use when |
 |------|----------|----------|
@@ -46,11 +48,13 @@ The probability of the model following **all** rules simultaneously is approxima
 
 **After (EARS):** "If a URL contains an unresolved template placeholder, the system shall omit the link and respond without it."
 
+The EARS version is shorter, has one clear trigger, and one clear action — no room for partial compliance.
+
 ---
 
 ## 3. Five Failure Patterns to Detect
 
-When reviewing a prompt, check for structural signals of each pattern:
+When reviewing a prompt, check for structural signals of each pattern. These patterns emerge from how prompts grow organically over time — patches on patches — and each one has a telltale signature in the prompt text.
 
 | Pattern | What happens | Signal in the prompt |
 |---------|-------------|----------------------|
@@ -74,16 +78,16 @@ VERIFY before responding:
 ...
 ```
 
-This makes multi-instruction compliance explicit and testable. Per Harada et al. (2024), instruction-level CoT improves all-rules compliance by 2–3× on GPT-4o and Claude 3.5 Sonnet.
+This makes multi-instruction compliance explicit and testable. Per Harada et al. (2024), instruction-level chain-of-thought improves all-rules compliance by 2-3x on GPT-4o and Claude 3.5 Sonnet.
 
-Keep the VERIFY list ≤ 8 items. If you need more, consolidate rules first.
+Keep the VERIFY list to 8 items or fewer. If you need more, consolidate rules first — a long VERIFY list defeats the purpose.
 
 ---
 
-## 5. Other Structural Rules
+## 5. Structural Rules
 
-- **One truth per rule.** If the same invariant is stated in two places, pick the most authoritative location and delete the duplicate.
-- **Urgency markers devalue each other.** Use CRITICAL/MANDATORY for at most 2 rules per prompt. Everything else should be plain prose.
-- **Static before dynamic.** Put the unchanging role/rules at the top. Inject dynamic context (product lists, user data) at the bottom. This enables prompt caching.
+- **One truth per rule.** If the same invariant is stated in two places, pick the most authoritative location and delete the duplicate. Duplication is how hallucination patterns start (Section 3).
+- **Urgency markers devalue each other.** Use CRITICAL/MANDATORY for at most 2 rules per prompt. If everything is critical, nothing is.
+- **Static before dynamic.** Put the unchanging role/rules at the top. Inject dynamic context (product lists, user data) at the bottom. This enables prompt caching and keeps the model's attention on rules first.
 - **Examples cost tokens.** Include examples only for non-obvious rules. One positive + one negative example per rule is enough.
-- **Patch-on-patch is a signal.** If you find rule → exception → exception-to-exception chains, consolidate. Organic growth via successive fixes is the most common source of rule-count bloat.
+- **Patch-on-patch is a signal.** If you find rule -> exception -> exception-to-exception chains, consolidate. Organic growth via successive fixes is the most common source of rule-count bloat.
