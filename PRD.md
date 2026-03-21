@@ -173,7 +173,7 @@ Each job has a SQLite database (`jobs/<job-id>/results.db`) using Node.js built-
 
 The SQLite store complements the markdown/JSON files — use markdown for human-readable artifacts and SQLite for data that needs to be queried or aggregated.
 
-### 4.4 Optimization Metrics
+### 4.5 Optimization Metrics
 
 The system tracks multiple metrics per eval run:
 
@@ -185,47 +185,52 @@ The system tracks multiple metrics per eval run:
 | `cost_usd` | Total API cost for the eval run | Token tracking |
 | `tool_usage_count` | Number of tool calls made | Agent telemetry |
 
-The orchestrator decides which metric(s) to optimize based on configuration. A trial is accepted if the **primary metric improves** and **no secondary metric regresses beyond a configurable threshold**.
+The orchestrator decides which metric(s) to optimize based on `JOB.md` configuration. A trial is accepted if the **primary metric improves** and **no secondary metric regresses beyond a configurable threshold**.
 
 ## 5. Detailed Workflow
 
 ### 5.1 Optimization Loop (End-to-End)
 
 ```
-[Human creates job: npm run create-job -- --id <job-id>]
+[Human creates job: npm run create-job -- --id <job-id>]  ← [DONE]
    Creates job folder with JOB.md, MEMORY.md, hypotheses/, results.db.
         │
         ▼
-[Human fills in JOB.md and optionally seeds MEMORY.md]
+[Human fills in JOB.md and optionally seeds MEMORY.md]    ← [DONE]
         │
         ▼
-[Human runs job: npm run run-job -- --id <job-id>]
+[Human runs baseline: npm run run-baseline-evals -- --id <job-id>]  ← [DONE]
         │
         ▼
-[1. JOB LOAD]
+[Human runs job: npm run run-job -- --id <job-id>]         ← [PLANNED]
+        │
+        ▼
+[1. JOB LOAD]                                               ← [DONE]
    Read JOB.md for objective, constraints, eval command, target repo path.
    Validate that required fields are filled in.
         │
         ▼
-[2. BASELINE EVAL]
-   Run eval command (from job.md) on current target agent state.
+[2. BASELINE EVAL]                                          ← [DONE]
+   Run eval command (from JOB.md) on current target agent state.
+   Spawns Claude Code via `child_process.spawn` with `--print --output-format stream-json`.
+   Claude Code runs install/build/eval commands and writes report.md.
    Store baseline metrics in results.db and MEMORY.md.
         │
         ▼
-[3. ANALYSIS]
+[3. ANALYSIS]                                               ← [PLANNED]
    Read MEMORY.md (past hypotheses, known patterns).
    Identify failing eval cases.
    Categorize failures (missing capability, wrong answer, timeout, etc.).
         │
         ▼
-[4. HYPOTHESIS FORMULATION]
+[4. HYPOTHESIS FORMULATION]                                 ← [PLANNED]
    Based on analysis + MEMORY.md, form a hypothesis:
    "If I add tool X / change prompt Y / refactor Z, then metric M will improve."
    Prioritize by expected impact and difficulty.
    Create hypothesis folder: jobs/<job-id>/hypotheses/<hypothesis-id>/
         │
         ▼
-[5. IMPLEMENTATION] ←── Coding Agent (Claude Code)
+[5. IMPLEMENTATION] ←── Coding Agent (Claude Code)          ← [PLANNED]
    Create a git branch from current best state.
    Inject MEMORY.md into coding agent's context.
    Coding agent implements the hypothesis:
@@ -234,34 +239,34 @@ The orchestrator decides which metric(s) to optimize based on configuration. A t
      - Refactor agent logic
      - Add helper functions
      - (optional) Write human-intervention.md if blocked
-   CONSTRAINT: Cannot modify files listed in job.md constraints.
+   CONSTRAINT: Cannot modify files listed in JOB.md constraints.
         │
         ▼
-[6. EVAL RUN]
-   Run eval command (from job.md) on the modified branch.
+[6. EVAL RUN]                                               ← [PLANNED]
+   Run eval command (from JOB.md) on the modified branch.
    Collect metrics (accuracy, latency, cost).
    Store results in results.db.
         │
         ▼
-[7. DECISION]
+[7. DECISION]                                               ← [PLANNED]
    Compare metrics to baseline.
    IF improved → ACCEPT: merge branch, update baseline, record in MEMORY.md.
    IF regressed/unchanged → REJECT: discard branch, record failure in MEMORY.md.
         │
         ▼
-[8. REPORT]
+[8. REPORT]                                                 ← [PLANNED]
    Generate hypothesis report.md (changes, results, decision).
    Summarizer agent updates MEMORY.md with learnings from this hypothesis.
         │
         ▼
-[9. LOOP CHECK]
+[9. LOOP CHECK]                                             ← [PLANNED]
    IF hypothesis_count < max_hypotheses AND there are still failing evals:
      → Go to step 3.
    ELSE:
      → Go to step 10.
         │
         ▼
-[10. FINAL REPORT]
+[10. FINAL REPORT]                                          ← [PLANNED]
    Generate final-report.md: all hypotheses, net metric changes,
    remaining failures, human interventions needed.
 ```
@@ -279,7 +284,7 @@ The coding agent (Claude Code) operates within strict boundaries defined by the 
 - Read eval results and error messages.
 - Write a `human-intervention.md` file in its hypothesis folder if it identifies an improvement it cannot execute.
 
-**Forbidden** (defined per-job in `job.md` constraints section):
+**Forbidden** (defined per-job in `JOB.md` constraints section):
 - Modify any file/directory listed in constraints (e.g., `evals/`, `golden-dataset.json`).
 - Modify the orchestrator code.
 - Make network calls to external services not already configured.
@@ -306,34 +311,36 @@ main (current best state)
 - Rejected hypotheses' branches are deleted.
 - This gives a clean git history of successful improvements.
 
-## 6. Job Folder Structure
+## 6. Job Folder Structure [DONE]
 
 ### 6.1 Directory Layout
 
 ```
 jobs/
-  job-2026-03-21-math-agent/
-    job.md                          # Job config (from template)
-    MEMORY.md                       # Shared learnings (injected into coding agent)
-    results.db                      # node:sqlite — structured eval data
-    final-report.md                 # Generated at end of job
+  my-job/                             # Created by: npm run create-job -- --id my-job
+    JOB.md                            # Job config (from templates/JOB-TEMPLATE.md)
+    MEMORY.md                         # Shared learnings (from templates/MEMORY-TEMPLATE.md)
+    results.db                        # node:sqlite — structured eval data
+    final-report.md                   # Generated at end of job [PLANNED]
     hypotheses/
-      001-add-calculator-tool/
-        hypothesis.md               # What we're testing and why
-        report.md                   # Results, metrics, decision
-        human-intervention.md       # (optional) Things the agent couldn't do
-        diff.patch                  # Git diff of changes made
+      000-baseline/                   # Created by: npm run run-baseline-evals -- --id my-job
+        report.md                     # Baseline eval results
+      001-add-calculator-tool/        # [PLANNED] Created by hypothesis runner
+        hypothesis.md                 # What we're testing and why
+        report.md                     # Results, metrics, decision
+        human-intervention.md         # (optional) Things the agent couldn't do
+        diff.patch                    # Git diff of changes made
       002-improve-system-prompt/
         hypothesis.md
         report.md
         diff.patch
       003-add-caching/
         hypothesis.md
-        report.md                   # Status: REJECTED
+        report.md                     # Status: REJECTED
         diff.patch
 ```
 
-### 6.2 Job Config Template (`job.md`)
+### 6.2 Job Config Template (`JOB.md`)
 
 The human creates this file before triggering a job. It defines everything the orchestrator needs to know about the target repo and this optimization run.
 
@@ -497,7 +504,7 @@ cd target-agent && npm run eval -- --output json
 
 ### 8.1 Configuration
 
-Configuration is defined per-job in `job.md` (see section 6.2). There is no global config file — each job is self-contained.
+Configuration is defined per-job in `JOB.md` (see section 6.2). There is no global config file — each job is self-contained.
 
 The orchestrator CLI reads the job folder path and loads everything from there:
 
@@ -505,7 +512,7 @@ The orchestrator CLI reads the job folder path and loads everything from there:
 npx auto-agent run --job job-2026-03-21-math-agent
 ```
 
-This loads `jobs/job-2026-03-21-math-agent/job.md` and uses it to determine:
+This loads `jobs/job-2026-03-21-math-agent/JOB.md` and uses it to determine:
 - Target repo path and starting branch
 - Eval command to run
 - Primary/secondary metrics and thresholds
@@ -516,7 +523,7 @@ This loads `jobs/job-2026-03-21-math-agent/job.md` and uses it to determine:
 
 | Module | Responsibility |
 |--------|---------------|
-| `JobLoader` | Reads `job.md`, initializes job folder, MEMORY.md, and results.db |
+| `JobLoader` | Reads `JOB.md`, initializes job folder, MEMORY.md, and results.db |
 | `BaselineRunner` | Runs eval command on current state, establishes metrics baseline |
 | `Analyzer` | Reads eval failures + MEMORY.md, identifies improvement areas |
 | `Hypothesizer` | Generates ranked hypotheses for what to try next |
@@ -527,10 +534,30 @@ This loads `jobs/job-2026-03-21-math-agent/job.md` and uses it to determine:
 | `GitManager` | Handles branching, merging, and rollback in the target repo |
 | `SqliteStore` | Manages `results.db` via `node:sqlite` — eval results, metrics, hypothesis metadata |
 
-### 8.3 Coding Agent Invocation
+### 8.3 Coding Agent Invocation [DONE — baseline; PLANNED — hypothesis]
 
-The orchestrator constructs a prompt for the coding agent that includes:
+The orchestrator spawns Claude Code as a subprocess:
 
+```typescript
+spawn("claude", [
+  "--print",
+  "--output-format", "stream-json",   // NDJSON streaming for real-time visibility
+  "--verbose",
+  "--dangerously-skip-permissions",   // No interactive prompts (runs unattended)
+  "--system-prompt", systemPrompt,
+  "--add-dir", jobDir,                // Gives Claude access to job artifacts
+  "-p", userPrompt,
+], { cwd: targetRepoPath, stdio: ["ignore", "pipe", "inherit"] });
+```
+
+The system prompt follows EARS syntax (from the prompt-engineering skill) with a VERIFY checklist for multi-instruction compliance:
+
+**Baseline eval system prompt** (implemented):
+- 3 EARS-style behavioral rules (read-only, error capture, failure documentation)
+- Structured report template (metrics table, failing cases, summary)
+- 4-item VERIFY checklist before writing the report
+
+**Hypothesis implementation prompt** (planned):
 ```
 You are improving a Mastra-based TypeScript agent. Your goal for this hypothesis:
 
@@ -538,21 +565,21 @@ You are improving a Mastra-based TypeScript agent. Your goal for this hypothesis
 **Target metric**: Improve {metric} (currently {current_value})
 **Failing eval cases**: {list of failing cases with inputs/expected/actual}
 
---- MEMORY.md (injected from job) ---
+## Rules
+1. The system shall not modify files matching: {forbidden paths from JOB.md}.
+2. When the system identifies an improvement it cannot execute, it shall write
+   a human-intervention.md file explaining what is needed and why.
+3. When implementation is complete, the system shall ensure the project builds
+   and tests pass before finishing.
+
+## Job Memory
 {contents of jobs/<job-id>/MEMORY.md}
---- END MEMORY.md ---
 
-**Rules**:
-1. You may modify any file EXCEPT those listed as forbidden below
-2. Forbidden paths: {list from job.md constraints}
-3. You may add new npm dependencies if needed
-4. You may add new tools, update the system prompt, or refactor agent logic
-5. When done, ensure the project builds (npm run build) and tests pass (npm test)
-6. If you identify an improvement you CANNOT execute (missing API key,
-   needs external setup, requires changing a forbidden file), write a
-   human-intervention.md file explaining what's needed and why
-
-**Working directory**: {target_repo_path} (on branch hyp/{hypothesis_id})
+VERIFY before finishing:
+1. No forbidden files were modified.
+2. The project builds successfully (npm run build exits 0).
+3. Tests pass (npm test exits 0).
+4. Changes directly address the hypothesis statement.
 ```
 
 ## 9. Acceptance Criteria for Hypotheses
@@ -561,8 +588,8 @@ A hypothesis is **accepted** if ALL of the following are true:
 
 1. The target agent builds successfully (`npm run build` exits 0).
 2. The primary metric improved (e.g., accuracy went up).
-3. No secondary metric regressed beyond its configured threshold (from job.md).
-4. No forbidden files were modified (verified via `git diff --name-only` against job.md constraints).
+3. No secondary metric regressed beyond its configured threshold (from JOB.md).
+4. No forbidden files were modified (verified via `git diff --name-only` against JOB.md constraints).
 5. The coding agent did not introduce obvious issues (build errors, test failures).
 
 A hypothesis is **rejected** if ANY of the above fail. Either way, the result is recorded in the hypothesis folder and MEMORY.md is updated.
@@ -601,7 +628,7 @@ A hypothesis is **rejected** if ANY of the above fail. Either way, the result is
 ```markdown
 # Job: job-2026-03-21-math-agent — Final Report
 
-**Objective**: Improve math agent accuracy (from job.md)
+**Objective**: Improve math agent accuracy (from JOB.md)
 **Duration**: 45 minutes
 **Hypotheses**: 5 (3 accepted, 2 rejected)
 
@@ -650,25 +677,29 @@ The analyzer should prioritize lower tiers first — no point attempting calculu
 
 ## 12. CLI Interface
 
-The system is a TypeScript CLI. The human triggers jobs manually.
+The system is a set of `npm run` scripts backed by TypeScript files in `scripts/`. Node.js 22+ runs `.ts` files directly via native type stripping (`--experimental-strip-types`). The human triggers jobs manually.
 
 ```bash
-# 1. Create a new job (scaffolds folder with templates + SQLite db)
+# 1. Create a new job (scaffolds folder with templates + SQLite db)    [DONE]
 npm run create-job -- --id my-math-agent
 # → Creates jobs/my-math-agent/ with JOB.md, MEMORY.md, hypotheses/, results.db
 
-# 2. Human fills in JOB.md and optionally seeds MEMORY.md
+# 2. Human fills in JOB.md and optionally seeds MEMORY.md             [DONE]
 
-# 3. Run the optimization job
+# 3. Run baseline evals (establishes metrics before any changes)       [DONE]
+npm run run-baseline-evals -- --id my-math-agent
+# → Spawns Claude Code, runs eval, writes hypotheses/000-baseline/report.md
+
+# 4. Run the full optimization job                                     [PLANNED]
 npm run run-job -- --id my-math-agent
 
-# Run with max hypotheses override
+# Run with max hypotheses override                                     [PLANNED]
 npm run run-job -- --id my-math-agent --max-hypotheses 5
 
-# View job status / results
+# View job status / results                                            [PLANNED]
 npm run job-status -- --id my-math-agent
 
-# List all jobs
+# List all jobs                                                        [PLANNED]
 npm run list-jobs
 ```
 
@@ -686,16 +717,18 @@ npm run list-jobs
 
 ## 14. Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Orchestrator | TypeScript CLI (Node.js) |
-| Target Agent | Mastra (TypeScript) |
-| Coding Agent | Claude Code (CLI) or Claude API with tool use |
-| Eval Runner | Custom (runs in target repo via command from job.md) |
-| Structured Storage | `node:sqlite` (built-in, per-job `results.db`) |
-| Human-readable Storage | Markdown + JSON files (job.md, MEMORY.md, reports, hypotheses) |
-| Git Operations | `simple-git` npm package or shell commands |
-| Process Management | Node.js `child_process` |
+| Component | Technology | Status |
+|-----------|-----------|--------|
+| Orchestrator | TypeScript (ES2024), Node.js 22+ with native type stripping | [DONE] |
+| Target Agent | Mastra (TypeScript) | External |
+| Coding Agent | Claude Code CLI (`spawn` with `--print --output-format stream-json --dangerously-skip-permissions`) | [DONE] |
+| Eval Runner | Custom (runs in target repo via command from JOB.md) | [DONE] |
+| Structured Storage | `node:sqlite` (`DatabaseSync` API, per-job `results.db`) | [DONE] |
+| Human-readable Storage | Markdown files (`JOB.md`, `MEMORY.md`, reports, hypotheses) | [DONE] |
+| Git Operations | `node:child_process.execFileSync` calling `git` directly | [DONE] |
+| Process Management | `node:child_process.spawn` with NDJSON stream parsing | [DONE] |
+| CLI Argument Parsing | `node:util.parseArgs` | [DONE] |
+| Dependencies | Zero runtime dependencies (all `node:` built-ins) | [DONE] |
 
 ## 15. MVP Scope
 
@@ -705,7 +738,7 @@ For the first working version:
 - Single optimization metric (accuracy).
 - Golden dataset with math NL queries (tiers 1-3).
 - Job folder structure with MEMORY.md, hypotheses, and `node:sqlite` storage.
-- Job config via `job.md` template (objective, constraints, eval command).
+- Job config via `JOB.md` template (objective, constraints, eval command).
 - Claude Code as the coding agent (invoked via CLI).
 - MEMORY.md injection into coding agent context.
 - Human intervention needed mechanism.
@@ -733,8 +766,10 @@ The system is considered working when:
 
 ## 17. Open Questions
 
-1. **Coding agent choice**: Should we use Claude Code CLI (spawns a subprocess) or the Claude API with tool use (more control but more code to write)?
+1. ~~**Coding agent choice**: Should we use Claude Code CLI (spawns a subprocess) or the Claude API with tool use?~~ **RESOLVED**: Claude Code CLI, spawned via `child_process.spawn` with `--print --output-format stream-json --dangerously-skip-permissions`. Provides real-time NDJSON streaming and full tool access without custom tool implementations.
 2. **Eval comparison strategy**: Should we compare to the original baseline or to the previous trial's result? (Recommendation: compare to the latest accepted state, not the original baseline.)
 3. **Partial improvements**: If accuracy improves on tier 1 but regresses on tier 2, is that accepted? (Recommendation: accept if net accuracy improves; flag regressions in the report.)
 4. **Memory pruning**: How aggressively should we prune old trial memory? (Recommendation: keep summaries forever, prune full diffs after 30 days.)
 5. **Concurrent loops**: Can the human trigger a new loop while one is running? (Recommendation for v1: reject with a message. Only one loop at a time.)
+6. ~~**Git library choice**: `simple-git` npm package or shell commands?~~ **RESOLVED**: Direct `git` calls via `execFileSync` — zero dependencies, full control.
+7. ~~**System prompt style**: Free-form or structured?~~ **RESOLVED**: EARS syntax with VERIFY checklist (prompt-engineering skill). Reduces rule count, improves compliance.
