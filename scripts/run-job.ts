@@ -166,9 +166,11 @@ function runClaude(
 
 // --- Decision parser (Task 8) ---
 
-function parseDecision(reportContent: string): "CONTINUE" | "ROLLBACK" {
+function parseDecision(
+  reportContent: string
+): "CONTINUE" | "ROLLBACK" | null {
   const match = reportContent.match(/\*\*Decision:\s*(CONTINUE|ROLLBACK)\*\*/);
-  return (match?.[1] as "CONTINUE" | "ROLLBACK") ?? "ROLLBACK";
+  return (match?.[1] as "CONTINUE" | "ROLLBACK") ?? null;
 }
 
 // --- Accuracy parser for summary ---
@@ -202,14 +204,16 @@ console.log(`Best branch: ${bestBranch}`);
 console.log();
 
 for (let i = 0; i < maxIterations; i++) {
-  const hypId = randomBytes(3).toString("hex");
+  const seq = String(i + 1).padStart(3, "0");
+  const hexId = randomBytes(3).toString("hex");
+  const hypId = `${seq}-${hexId}`;
   const hypBranch = `${jobId}-hyp-${hypId}`;
 
   console.log(`\n${"=".repeat(60)}`);
   console.log(`[iteration ${i + 1}/${maxIterations}] Starting hypothesis ${hypId}`);
   console.log(`${"=".repeat(60)}\n`);
 
-  // Create hypothesis folder + SQLite row (Task 5)
+  // Create hypothesis folder + SQLite row
   const hypothesis = await createHypothesis({
     jobDir,
     id: hypId,
@@ -217,10 +221,10 @@ for (let i = 0; i < maxIterations; i++) {
     branchName: hypBranch,
   });
 
-  // Copy REPORT template (Task 5)
+  // Copy REPORT template
   await copyFile(reportTemplatePath, join(hypothesis.dir, "REPORT.md"));
 
-  // Create git branch from current best (Task 5)
+  // Create git branch from current best
   git("checkout", bestBranch);
   try {
     git("checkout", "-b", hypBranch);
@@ -274,7 +278,7 @@ ${memoryMd}
 ## Job Configuration
 ${jobMd}`;
 
-  const userPrompt = `Run hypothesis ${hypId} for job "${jobId}". Analyze the baseline failures, implement an improvement, run evals, and fill in the report.`;
+  const userPrompt = `Run hypothesis ${hypId} (iteration ${i + 1}/${maxIterations}) for job "${jobId}". Analyze the failures, implement an improvement, run evals, and fill in the report.`;
 
   // Spawn Claude Code (Task 7)
   const exitCode = await runClaude(
@@ -284,27 +288,46 @@ ${jobMd}`;
     jobDir
   );
 
-  // Parse decision from REPORT.md (Task 8)
+  // Parse decision from REPORT.md
   const reportPath = join(hypothesis.dir, "REPORT.md");
-  let decision: "CONTINUE" | "ROLLBACK" = "ROLLBACK";
-  let accuracy = "N/A";
 
-  if (exitCode === 0 && existsSync(reportPath)) {
-    const reportContent = await readFile(reportPath, "utf-8");
-    decision = parseDecision(reportContent);
-    accuracy = parseAccuracy(reportContent);
-  } else {
-    console.error(
-      `\nClaude Code exited with code ${exitCode}. Defaulting to ROLLBACK.`
-    );
+  if (exitCode !== 0) {
+    console.error(`\nClaude Code exited with code ${exitCode}.`);
+    process.exit(1);
   }
 
-  // Handle decision (Tasks 9, 10)
+  if (!existsSync(reportPath)) {
+    console.error(`\nREPORT.md not found at ${reportPath}.`);
+    process.exit(1);
+  }
+
+  const reportContent = await readFile(reportPath, "utf-8");
+  const decision = parseDecision(reportContent);
+  const accuracy = parseAccuracy(reportContent);
+
+  if (!decision) {
+    console.error(
+      `\nNo valid **Decision: CONTINUE** or **Decision: ROLLBACK** found in ${reportPath}.`
+    );
+    process.exit(1);
+  }
+
+  // Commit all changes on the hypothesis branch (regardless of decision)
+  try {
+    git("add", "-A");
+    git("commit", "-m", `feat(experiment): hypothesis ${hypId} - ${decision}`);
+  } catch {
+    // Nothing to commit (no changes made) — that's fine
+  }
+
+  // Handle decision
   if (decision === "CONTINUE") {
     updateHypothesisStatus(hypId, "accepted");
     bestBranch = hypBranch;
+    // Next iteration will branch from this accepted branch
   } else {
     updateHypothesisStatus(hypId, "rejected");
+    // Backtrack: return to the branch this hypothesis was created from
     git("checkout", bestBranch);
   }
 
