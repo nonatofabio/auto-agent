@@ -5,8 +5,12 @@ import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { createHypothesis } from "../utils/create-hypothesis.ts";
-import { runClaude } from "../utils/run-claude.ts";
+import { assertClaudeInstalled, runClaude } from "../utils/run-claude.ts";
 import { runBaselineEvals } from "./run-baseline-evals.ts";
+
+// --- Preflight check ---
+
+assertClaudeInstalled();
 
 // --- CLI parsing ---
 

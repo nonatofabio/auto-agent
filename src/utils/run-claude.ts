@@ -1,5 +1,15 @@
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { styleText } from "node:util";
+
+export function assertClaudeInstalled(): void {
+  try {
+    execFileSync("claude", ["--version"], { stdio: "pipe", encoding: "utf-8" });
+  } catch {
+    console.error(styleText("red", "Error: Claude CLI is not installed or not found in PATH."));
+    console.error(`Install it with: ${styleText("yellow", "npm install -g @anthropic-ai/claude-code")}`);
+    process.exit(1);
+  }
+}
 
 export function runClaude(
   systemPrompt: string,
