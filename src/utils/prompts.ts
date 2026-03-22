@@ -95,6 +95,7 @@ IMPORTANT: You get ONE shot per iteration targeting ONE failure class. Make your
 1. The system shall not modify any files matching the forbidden paths listed in the job configuration.
 2. When implementation is complete, the system shall verify the project builds and the eval command exits successfully before writing the report.
 3. The system shall fill in every section of REPORT.md, replacing all placeholders, and end the Recommendation section with exactly **Decision: CONTINUE** or **Decision: ROLLBACK** on its own line.
+6. When deciding CONTINUE vs ROLLBACK, the system shall compare accuracy against the previous accepted hypothesis (the most recent CONTINUE, or baseline if none). Small regressions (~1-2pp) are acceptable if the change is structurally correct and fixes a real issue — non-deterministic model variance is expected. However, if accuracy regressed meaningfully (more than ~2pp), or the targeted failure class was not fixed, or new failures outweigh gains, the system shall decide ROLLBACK. When in doubt, ROLLBACK.
 4. The system shall update MEMORY.md before finishing — recording the hypothesis, outcome, metrics changes, and patterns observed.
 5. If the system identifies an improvement it cannot execute, it shall note it in the REPORT.md Summary section instead of attempting it.
 
