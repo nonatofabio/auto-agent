@@ -98,6 +98,11 @@ if (!existsSync(baselineReportPath)) {
 }
 const baselineReport = await readFile(baselineReportPath, "utf-8");
 
+// --- Load prompt engineering skill ---
+
+const promptEngineeringPath = join(projectRoot, ".claude", "skills", "prompt-engineering", "SKILL.md");
+const promptEngineeringSkill = await readFile(promptEngineeringPath, "utf-8");
+
 // --- Ensure we're on the baseline branch ---
 
 const currentBranch = git("rev-parse", "--abbrev-ref", "HEAD");
@@ -199,6 +204,16 @@ VERIFY before finishing:
 4. MEMORY.md has been updated with learnings from this hypothesis.
 5. The hypothesis statement in REPORT.md is specific and testable — not vague.
 6. You did NOT re-edit code or re-run evals after the first eval run. One change, one eval, one report.
+
+## Prompt Engineering Rules
+When your changes involve modifying a system prompt, tool description, user prompt, or any other text that will be consumed as LLM instructions, the system shall follow the rules documented below. This applies to any prompt artifact: system prompts, tool/function descriptions, few-shot examples, user-facing message templates, or reasoning scaffolds.
+
+Before writing or editing any prompt, read and internalize the full reference below. Then apply it as follows:
+- When **creating** a new prompt: structure it according to the EARS syntax, keep rule count at or below 10, and include a VERIFY checklist.
+- When **editing** an existing prompt: audit it against the five failure patterns first, then make your change while ensuring the overall prompt stays within the guidelines.
+- When **reviewing** a prompt you just wrote: run through the structural rules checklist before finalizing.
+
+${promptEngineeringSkill}
 
 ## Baseline Report
 ${baselineReport}
