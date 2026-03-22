@@ -12,13 +12,13 @@ const { values } = parseArgs({
 
 if (!values.id) {
   console.error(
-    styleText("red", "Usage: node scripts/create-job.ts --id <job-id>")
+    styleText("red", "Usage: npm run create-job -- --id <job-id>")
   );
   process.exit(1);
 }
 
 const jobId: string = values.id;
-const projectRoot: string = resolve(import.meta.dirname, "..");
+const projectRoot: string = resolve(import.meta.dirname, "..", "..");
 const jobDir: string = join(projectRoot, "jobs", jobId);
 
 if (existsSync(jobDir)) {

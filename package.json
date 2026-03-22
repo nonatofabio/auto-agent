@@ -8,8 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "create-job": "node scripts/create-job.ts",
-    "run-job": "node scripts/run-job.ts"
+    "create-job": "node src/scripts/create-job.ts",
+    "run-job": "node src/scripts/run-job.ts"
   },
   "devDependencies": {
     "@types/node": "^25.5.0"

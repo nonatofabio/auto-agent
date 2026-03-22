@@ -27,7 +27,7 @@ if (!values.id) {
 
 const jobId = values.id;
 const maxIterations = parseInt(values["max-iterations"] ?? "5", 10);
-const projectRoot = resolve(import.meta.dirname, "..");
+const projectRoot = resolve(import.meta.dirname, "..", "..");
 const jobDir = join(projectRoot, "jobs", jobId);
 
 if (!existsSync(jobDir)) {
