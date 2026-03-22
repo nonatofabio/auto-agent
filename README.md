@@ -1,5 +1,12 @@
 # auto-agent
 
+auto-agent is like [Autoresearch](https://github.com/karpathy/autoresearch), but for AI agents.
+
+This is an example of the system running agains a [test repo](https://github.com/alfonsograziano/auto-agent-demo).
+
+![Example results](public/images/example-results.png)
+
+
 A self-evolving agent optimization system that autonomously improves a target AI agent's performance through iterative, hypothesis-driven improvements. Given a golden dataset of expected input/output pairs, it runs an optimization loop — analyzing failures, implementing fixes, evaluating results, and accepting or rolling back changes — until the agent meets the desired performance bar.
 
 ## How It Works
@@ -8,10 +15,6 @@ auto-agent uses a **two-repository architecture**:
 
 - **Orchestrator** (this repo) — controls the optimization loop, manages git branches, injects context, and tracks decisions.
 - **Target agent** (separate repo) — the agent being improved. The orchestrator spawns [Claude Code](https://docs.anthropic.com/en/docs/claude-code) inside this repo to analyze and modify its code.
-
-This is an example of the system running agains a [test repo](https://github.com/alfonsograziano/auto-agent-demo).
-
-![Example results](public/images/example-results.png)
 
 
 
