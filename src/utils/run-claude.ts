@@ -1,4 +1,8 @@
 import { spawn, execFileSync } from "node:child_process";
+import { writeFileSync, unlinkSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { randomBytes } from "node:crypto";
 import { styleText } from "node:util";
 
 export function assertClaudeInstalled(): void {
@@ -17,6 +21,11 @@ export function runClaude(
   cwd: string,
   addDir: string
 ): Promise<number> {
+  // Write prompts to temp files to avoid E2BIG when args exceed OS limits
+  const id = randomBytes(8).toString("hex");
+  const systemPromptFile = join(tmpdir(), `claude-sp-${id}.txt`);
+  writeFileSync(systemPromptFile, systemPrompt);
+
   return new Promise((resolve) => {
     const claude = spawn(
       "claude",
@@ -26,8 +35,8 @@ export function runClaude(
         "stream-json",
         "--verbose",
         "--dangerously-skip-permissions",
-        "--system-prompt",
-        systemPrompt,
+        "--system-prompt-file",
+        systemPromptFile,
         "--add-dir",
         addDir,
         "-p",
@@ -63,6 +72,7 @@ export function runClaude(
     });
 
     claude.on("close", (code) => {
+      try { unlinkSync(systemPromptFile); } catch {}
       resolve(code ?? 1);
     });
   });
