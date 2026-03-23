@@ -127,3 +127,135 @@ ${memoryMd}
 ## Job Configuration
 ${jobMd}`;
 }
+
+// --- Changelog prompt ---
+
+export interface HypothesisContext {
+  id: string;
+  branch: string;
+  decision: "CONTINUE" | "ROLLBACK";
+  accuracy: string;
+  report: string;
+  diff: string;
+}
+
+export interface ChangelogSystemPromptParams {
+  jobId: string;
+  baseBranch: string;
+  finalBranch: string;
+  fullDiff: string;
+  gitLog: string;
+  baselineReport: string;
+  memoryMd: string;
+  jobMd: string;
+  hypotheses: HypothesisContext[];
+  changelogPath: string;
+}
+
+export function getChangelogSystemPrompt(params: ChangelogSystemPromptParams): string {
+  const {
+    jobId,
+    baseBranch,
+    finalBranch,
+    fullDiff,
+    gitLog,
+    baselineReport,
+    memoryMd,
+    jobMd,
+    hypotheses,
+    changelogPath,
+  } = params;
+
+  const continued = hypotheses.filter((h) => h.decision === "CONTINUE");
+  const rolledBack = hypotheses.filter((h) => h.decision === "ROLLBACK");
+
+  const hypothesisSections = hypotheses
+    .map((h) => {
+      return `### Hypothesis ${h.id} (${h.decision})
+**Branch:** ${h.branch}
+**Accuracy:** ${h.accuracy}
+
+#### Report
+${h.report}
+
+#### Diff (changes introduced by this hypothesis)
+\`\`\`diff
+${h.diff}
+\`\`\``;
+    })
+    .join("\n\n---\n\n");
+
+  return `You are a changelog report generator. You analyze a completed auto-agent optimization job and produce a concise CHANGELOG.md summarizing what changed and why.
+
+## Context
+- Job ID: ${jobId}
+- Base branch: ${baseBranch}
+- Final branch: ${finalBranch}
+- Total hypotheses: ${hypotheses.length} (${continued.length} accepted, ${rolledBack.length} rolled back)
+- Output file: ${changelogPath}
+
+## Rules
+1. Write the changelog to ${changelogPath}. Create the file with the exact structure described below.
+2. Be concise. No lengthy narratives. Each hypothesis section should be a few lines plus its code diff. The reader can refer to individual REPORT.md files for details.
+3. Include actual code diffs in fenced \`\`\`diff code blocks for each accepted hypothesis.
+4. For rolled-back hypotheses, write one short paragraph each — what was attempted and why it failed. No code diff needed.
+5. Do not modify any files in the target repository or hypothesis folders. Only create CHANGELOG.md.
+
+## CHANGELOG.md Structure
+
+Write the file with these sections in order:
+
+### 1. Header
+\`# Changelog: ${jobId}\`
+One-line summary: base branch, final branch, number of iterations, final accuracy.
+
+### 2. Baseline
+Brief section showing starting metrics from the baseline. 2-3 lines max.
+
+### 3. Accuracy Progression
+A markdown table showing accuracy across accepted iterations:
+| # | Hypothesis | Accuracy | Delta |
+With baseline as the first row and each CONTINUE hypothesis as subsequent rows.
+
+### 4. Accepted Changes (one subsection per CONTINUE hypothesis, in order)
+For each accepted hypothesis:
+- \`## {hypothesis ID}\` as heading
+- **Branch:** the branch name
+- **Problem:** one-line summary of what problem it solved (extract from the report's hypothesis statement)
+- **Accuracy:** before → after
+- **Diff:**
+\`\`\`diff
+(the actual code diff for this hypothesis)
+\`\`\`
+
+### 5. Rejected Attempts
+A section listing each ROLLBACK hypothesis as a short paragraph: what was tried, why it was rolled back. No code diffs.
+
+### 6. Cherry-Pick Guide
+List the accepted hypothesis branches in order. Add a note that branches build incrementally on each other, so cherry-picking individual branches may not apply cleanly.
+
+### 7. Full Diff
+The complete diff from base branch to final branch in a fenced \`\`\`diff block. This is the total cumulative change.
+
+## Input Data
+
+### Job Configuration
+${jobMd}
+
+### Baseline Report
+${baselineReport}
+
+### Job Memory
+${memoryMd}
+
+### Git Log (${baseBranch}..${finalBranch})
+${gitLog}
+
+### Full Diff (${baseBranch}...${finalBranch})
+\`\`\`diff
+${fullDiff}
+\`\`\`
+
+### Per-Hypothesis Data
+${hypothesisSections}`;
+}

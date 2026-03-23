@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-job": "node src/scripts/create-job.ts",
-    "run-job": "node src/scripts/run-job.ts"
+    "run-job": "node src/scripts/run-job.ts",
+    "generate-changelog": "node src/scripts/generate-changelog.ts"
   },
   "devDependencies": {
     "@types/node": "^25.5.0"
