@@ -7,7 +7,7 @@ import { createInterface } from "node:readline/promises";
 import { assertClaudeInstalled, runClaude } from "../utils/run-claude.ts";
 import {
   getChangelogSystemPrompt,
-  type HypothesisContext,
+  type HypothesisMeta,
 } from "../utils/prompts.ts";
 
 // --- Preflight ---
@@ -128,7 +128,6 @@ if (!existsSync(baselineReportPath)) {
   console.error(styleText("red", "Error: Baseline REPORT.md not found. Run the job first."));
   process.exit(1);
 }
-const baselineReport = await readFile(baselineReportPath, "utf-8");
 
 // Scan hypothesis dirs
 const hypDirNames = (await readdir(hypothesesDir, { withFileTypes: true }))
@@ -163,12 +162,9 @@ for (const dirName of hypDirNames) {
 
 console.log(`  Found ${hypDirNames.length} hypotheses (all complete)`);
 
-// --- Build hypothesis context ---
+// --- Build lightweight hypothesis metadata ---
 
-// Reconstruct parent chain: baseline → first CONTINUE → second CONTINUE → ...
-const baselineBranch = `${jobId}-baseline`;
-const hypotheses: HypothesisContext[] = [];
-let currentParent = baselineBranch;
+const hypotheses: HypothesisMeta[] = [];
 
 for (const dirName of hypDirNames) {
   const reportPath = join(hypothesesDir, dirName, "REPORT.md");
@@ -177,46 +173,11 @@ for (const dirName of hypDirNames) {
   const accuracy = parseAccuracy(report);
   const branch = parseBranch(report) || `${jobId}-hyp-${dirName}`;
 
-  // Compute diff for this hypothesis against its parent
-  let diff = "";
-  try {
-    diff = git("diff", `${currentParent}...${branch}`);
-  } catch {
-    diff = "(diff unavailable — branch may not exist locally)";
-  }
-
-  hypotheses.push({ id: dirName, branch, decision, accuracy, report, diff });
-
-  if (decision === "CONTINUE") {
-    currentParent = branch;
-  }
+  hypotheses.push({ id: dirName, branch, decision, accuracy });
 }
-
-// --- Compute full diff and git log ---
-
-console.log("  Computing diffs...");
-
-let fullDiff: string;
-try {
-  fullDiff = git("diff", `${baseBranch}...${finalBranch}`);
-} catch (e) {
-  console.error(styleText("red", `Error: Could not compute diff between ${baseBranch} and ${finalBranch}`));
-  console.error(String(e));
-  process.exit(1);
-}
-
-let gitLog: string;
-try {
-  gitLog = git("log", "--oneline", `${baseBranch}..${finalBranch}`);
-} catch {
-  gitLog = "(git log unavailable)";
-}
-
-// --- Read MEMORY.md ---
-
-const memoryMd = await readFile(join(jobDir, "MEMORY.md"), "utf-8");
 
 // --- Build prompt and invoke Claude ---
+// Claude Code will read the actual files and compute diffs itself
 
 const changelogPath = join(jobDir, "CHANGELOG.md");
 
@@ -224,11 +185,10 @@ const systemPrompt = getChangelogSystemPrompt({
   jobId,
   baseBranch,
   finalBranch,
-  fullDiff,
-  gitLog,
-  baselineReport,
-  memoryMd,
-  jobMd,
+  targetRepoPath,
+  jobMdPath,
+  memoryMdPath: join(jobDir, "MEMORY.md"),
+  hypothesesDir,
   hypotheses,
   changelogPath,
 });

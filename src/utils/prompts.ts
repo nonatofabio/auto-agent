@@ -130,25 +130,22 @@ ${jobMd}`;
 
 // --- Changelog prompt ---
 
-export interface HypothesisContext {
+export interface HypothesisMeta {
   id: string;
   branch: string;
   decision: "CONTINUE" | "ROLLBACK";
   accuracy: string;
-  report: string;
-  diff: string;
 }
 
 export interface ChangelogSystemPromptParams {
   jobId: string;
   baseBranch: string;
   finalBranch: string;
-  fullDiff: string;
-  gitLog: string;
-  baselineReport: string;
-  memoryMd: string;
-  jobMd: string;
-  hypotheses: HypothesisContext[];
+  targetRepoPath: string;
+  jobMdPath: string;
+  memoryMdPath: string;
+  hypothesesDir: string;
+  hypotheses: HypothesisMeta[];
   changelogPath: string;
 }
 
@@ -157,11 +154,10 @@ export function getChangelogSystemPrompt(params: ChangelogSystemPromptParams): s
     jobId,
     baseBranch,
     finalBranch,
-    fullDiff,
-    gitLog,
-    baselineReport,
-    memoryMd,
-    jobMd,
+    targetRepoPath,
+    jobMdPath,
+    memoryMdPath,
+    hypothesesDir,
     hypotheses,
     changelogPath,
   } = params;
@@ -169,21 +165,19 @@ export function getChangelogSystemPrompt(params: ChangelogSystemPromptParams): s
   const continued = hypotheses.filter((h) => h.decision === "CONTINUE");
   const rolledBack = hypotheses.filter((h) => h.decision === "ROLLBACK");
 
-  const hypothesisSections = hypotheses
-    .map((h) => {
-      return `### Hypothesis ${h.id} (${h.decision})
-**Branch:** ${h.branch}
-**Accuracy:** ${h.accuracy}
+  // Build a lightweight summary table — Claude will read the full reports and compute diffs itself
+  const hypothesisTable = hypotheses
+    .map((h) => `| ${h.id} | ${h.branch} | ${h.decision} | ${h.accuracy} |`)
+    .join("\n");
 
-#### Report
-${h.report}
-
-#### Diff (changes introduced by this hypothesis)
-\`\`\`diff
-${h.diff}
-\`\`\``;
-    })
-    .join("\n\n---\n\n");
+  // Reconstruct the parent chain so Claude knows how to compute per-hypothesis diffs
+  const baselineBranch = `${jobId}-baseline`;
+  const diffInstructions: string[] = [];
+  let currentParent = baselineBranch;
+  for (const h of hypotheses) {
+    diffInstructions.push(`- ${h.id}: \`git diff ${currentParent}...${h.branch}\``);
+    if (h.decision === "CONTINUE") currentParent = h.branch;
+  }
 
   return `You are a changelog report generator. You analyze a completed auto-agent optimization job and produce a concise CHANGELOG.md summarizing what changed and why.
 
@@ -191,8 +185,27 @@ ${h.diff}
 - Job ID: ${jobId}
 - Base branch: ${baseBranch}
 - Final branch: ${finalBranch}
+- Target repository: ${targetRepoPath}
 - Total hypotheses: ${hypotheses.length} (${continued.length} accepted, ${rolledBack.length} rolled back)
 - Output file: ${changelogPath}
+
+## Where to find data
+Read these files to gather the information you need:
+- Job configuration: ${jobMdPath}
+- Job memory: ${memoryMdPath}
+- Baseline report: ${hypothesesDir}/000-baseline/REPORT.md
+- Hypothesis reports: ${hypothesesDir}/{id}/REPORT.md for each hypothesis listed below
+
+Compute diffs by running git commands in the target repository at ${targetRepoPath}:
+- Full diff: \`git diff ${baseBranch}...${finalBranch}\`
+- Git log: \`git log --oneline ${baseBranch}..${finalBranch}\`
+- Per-hypothesis diffs (each hypothesis vs its parent):
+${diffInstructions.join("\n")}
+
+## Hypothesis Summary
+| ID | Branch | Decision | Accuracy |
+|----|--------|----------|----------|
+${hypothesisTable}
 
 ## Rules
 1. Write the changelog to ${changelogPath}. Create the file with the exact structure described below.
@@ -235,27 +248,5 @@ A section listing each ROLLBACK hypothesis as a short paragraph: what was tried,
 List the accepted hypothesis branches in order. Add a note that branches build incrementally on each other, so cherry-picking individual branches may not apply cleanly.
 
 ### 7. Full Diff
-The complete diff from base branch to final branch in a fenced \`\`\`diff block. This is the total cumulative change.
-
-## Input Data
-
-### Job Configuration
-${jobMd}
-
-### Baseline Report
-${baselineReport}
-
-### Job Memory
-${memoryMd}
-
-### Git Log (${baseBranch}..${finalBranch})
-${gitLog}
-
-### Full Diff (${baseBranch}...${finalBranch})
-\`\`\`diff
-${fullDiff}
-\`\`\`
-
-### Per-Hypothesis Data
-${hypothesisSections}`;
+The complete diff from base branch to final branch in a fenced \`\`\`diff block. This is the total cumulative change.`;
 }
