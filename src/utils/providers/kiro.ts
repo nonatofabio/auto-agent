@@ -47,15 +47,21 @@ export class KiroProvider implements AgentProvider {
       : opts.userPrompt;
 
     return new Promise((resolve) => {
-      const kiro = spawn(
-        "kiro-cli",
-        [
+      const args = [
           "chat",
           "--no-interactive",
           "--trust-all-tools",
-          userPrompt,
-        ],
-        {
+      ];
+
+      // Allow overriding Kiro's model via KIRO_MODEL env var
+      const kiroModel = process.env.KIRO_MODEL;
+      if (kiroModel) {
+        args.push("--model", kiroModel);
+      }
+
+      args.push(userPrompt);
+
+      const kiro = spawn("kiro-cli", args, {
           cwd: opts.cwd,
           stdio: ["ignore", "pipe", "inherit"],
         }

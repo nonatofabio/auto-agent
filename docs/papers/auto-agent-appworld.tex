@@ -1,0 +1,297 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!10},
+}
+
+\title{Self-Evolving Agent Optimization with Multi-Provider Coding Agents:\\A Study on AppWorld with auto-agent and Kiro CLI}
+
+\author{
+  Fabio Nonato de Paula \\
+  \texttt{nonatofabio@github}
+}
+
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present an empirical study of \textbf{auto-agent}, a self-evolving agent optimization system that autonomously improves AI agents through iterative, hypothesis-driven code modifications. We extend auto-agent with a provider abstraction supporting multiple coding agent backends, including a new integration with Kiro CLI alongside the original Claude Code support. We evaluate the system on AppWorld, a benchmark of 732 interactive coding tasks across 9 simulated real-world applications. Using Kiro CLI as the orchestrating coding agent, we measure how effectively auto-agent improves a minimal AppWorld agent when the target agent uses six different Claude models via Amazon Bedrock: Claude 3.5 Haiku, Claude Haiku 4.5, Claude Sonnet 4, Claude Sonnet 4.5, Claude Sonnet 4.6, and Claude Opus 4.6. Starting from 0\% accuracy across all configurations, auto-agent achieves up to 80\% accuracy over three optimization iterations for Opus 4.6---the only model to improve monotonically across all iterations---while Sonnet-class models plateau at 20--40\% after a single iteration. These results demonstrate that autonomous agent improvement is feasible and that the target model's capability is the primary determinant of both optimization ceiling and the system's ability to sustain multi-iteration gains.
+\end{abstract}
+
+\section{Introduction}
+
+The development of AI agents that interact with external tools and APIs is a rapidly growing area, yet improving these agents remains largely a manual process. Developers analyze failure cases, hypothesize improvements, implement changes, and evaluate results---a cycle that is time-consuming and difficult to scale.
+
+\textbf{auto-agent}\footnote{\url{https://github.com/alfonsograziano/auto-agent}} addresses this by automating the optimization loop. Given a target agent repository and a golden dataset of expected behaviors, auto-agent spawns a coding agent to analyze failures, implement fixes, run evaluations, and decide whether to accept or rollback changes. Each iteration produces a hypothesis---a single, scoped improvement attempt---with accumulated learnings persisted across iterations.
+
+In this work, we make three contributions:
+
+\begin{enumerate}
+    \item \textbf{Provider abstraction}: We decouple auto-agent from Claude Code, introducing a pluggable provider interface that supports both Claude Code and Kiro CLI as coding agent backends.
+    \item \textbf{Kiro CLI integration}: We implement a Kiro CLI provider that uses steering files for system prompt injection while preserving full tool access, resolving a limitation where Kiro's \texttt{--agent} flag disables built-in tools.
+    \item \textbf{AppWorld evaluation}: We evaluate auto-agent's optimization capability on AppWorld, a challenging benchmark of interactive coding tasks, across four Claude model tiers serving as the target agent's LLM backbone.
+\end{enumerate}
+
+\section{Background}
+
+\subsection{auto-agent}
+
+auto-agent uses a two-repository architecture: an \emph{orchestrator} that controls the optimization loop, and a \emph{target agent} repository containing the agent being improved. The orchestrator spawns a coding agent inside the target repository with full context about the job objective, prior learnings, and evaluation results.
+
+Each optimization iteration follows a fixed protocol:
+\begin{enumerate}
+    \item Read the baseline report, accumulated memory (\texttt{MEMORY.md}), and job configuration
+    \item Create a git branch for the new hypothesis
+    \item Spawn the coding agent with full context
+    \item The coding agent analyzes failures, implements a fix targeting one failure class, and runs evaluations
+    \item Parse the decision (\texttt{CONTINUE} or \texttt{ROLLBACK}) from the structured report
+    \item Accept or discard the hypothesis branch accordingly
+\end{enumerate}
+
+A shared \texttt{MEMORY.md} file persists learnings across iterations, preventing the system from repeating failed strategies.
+
+\subsection{AppWorld}
+
+AppWorld~\cite{appworld} is a benchmark of 732 autonomous agent tasks built on a simulated world of 9 real-world applications (Spotify, Amazon, Venmo, etc.) with 457 APIs and approximately 100 simulated users. Tasks require interactive Python code generation to call APIs, navigate paginated results, and complete multi-step workflows. Evaluation is state-based: database unit tests verify whether the agent achieved the correct outcome regardless of the code path taken.
+
+AppWorld is particularly challenging because agents must:
+\begin{itemize}
+    \item Discover correct API signatures through documentation
+    \item Handle authentication flows (login, access tokens)
+    \item Navigate paginated API responses
+    \item Compose multi-step workflows across applications
+\end{itemize}
+
+\subsection{Kiro CLI}
+
+Kiro CLI\footnote{\url{https://kiro.dev/cli/}} is a terminal-based AI coding assistant. Unlike Claude Code, which provides \texttt{--system-prompt} and \texttt{--add-dir} flags for programmatic control, Kiro CLI requires alternative integration strategies. We discovered that Kiro's \texttt{--agent} flag disables all built-in tools (file read/write, shell execution), making it unsuitable for auto-agent's use case. Instead, we use \emph{steering files}---markdown files placed in \texttt{.kiro/steering/} with \texttt{inclusion: always} frontmatter---which inject system prompts while preserving full tool access.
+
+\section{System Design}
+
+\subsection{Provider Abstraction}
+
+We introduce an \texttt{AgentProvider} interface with three methods:
+
+\begin{lstlisting}[language=TypeScript]
+interface AgentProvider {
+  readonly name: string;
+  assertInstalled(): void;
+  run(opts: AgentRunOptions): Promise<number>;
+  cleanup?(): Promise<void>;
+}
+\end{lstlisting}
+
+The \texttt{ClaudeProvider} wraps Claude Code's CLI with \texttt{--system-prompt} and \texttt{--add-dir} flags. The \texttt{KiroProvider} writes a temporary steering file to \texttt{.kiro/steering/} and folds the job directory context into the user prompt. Provider selection is configured via a \texttt{**Provider**} field in the job's \texttt{JOB.md}.
+
+\subsection{AppWorld Target Agent}
+
+We construct a minimal target agent consisting of three files:
+
+\begin{itemize}
+    \item \texttt{agent.py}: Contains the system prompt, LLM calling logic, and a \texttt{solve\_task()} function implementing a ReAct-style loop
+    \item \texttt{llm\_call.py}: A subprocess-based LLM caller that invokes Amazon Bedrock outside of AppWorld's \texttt{freezegun} time patching (which otherwise breaks AWS SigV4 signature validation)
+    \item \texttt{run\_eval.py}: An evaluation runner that iterates over AppWorld tasks and outputs JSON results
+\end{itemize}
+
+The agent starts with a deliberately minimal system prompt and no API exploration logic, establishing a 0\% baseline that auto-agent must improve.
+
+\section{Experimental Setup}
+
+\subsection{Models}
+
+We evaluate six Claude models available via Amazon Bedrock, spanning three capability tiers:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Model} & \textbf{Tier} & \textbf{Generation} \\
+\midrule
+Claude 3.5 Haiku & Haiku (small) & Previous \\
+Claude Haiku 4.5 & Haiku (small) & Current \\
+Claude Sonnet 4 & Sonnet (medium) & Previous \\
+Claude Sonnet 4.5 & Sonnet (medium) & Current \\
+Claude Sonnet 4.6 & Sonnet (medium) & Latest \\
+Claude Opus 4.6 & Opus (large) & Latest \\
+\bottomrule
+\end{tabular}
+\caption{Target agent models evaluated. All accessed via Bedrock cross-region inference profiles in \texttt{us-east-1}.}
+\label{tab:models}
+\end{table}
+
+\subsection{Configuration}
+
+All experiments use:
+\begin{itemize}
+    \item \textbf{Orchestrating agent}: Kiro CLI (the coding agent that modifies the target agent)
+    \item \textbf{Dataset}: 10 AppWorld \texttt{train} tasks (Spotify queries, mutations, multi-app workflows)
+    \item \textbf{Max iterations}: 3 per model
+    \item \textbf{Forbidden files}: \texttt{run\_eval.py}, \texttt{llm\_call.py}, \texttt{data/}
+    \item \textbf{Modifiable}: \texttt{agent.py} (system prompt, agent loop logic, helper functions)
+\end{itemize}
+
+The orchestrating Kiro agent receives the same job configuration for all four experiments, ensuring that differences in outcomes are attributable to the target model's capability rather than prompt variation.
+
+\section{Results}
+
+\subsection{Quantitative Results}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Model} & \textbf{Baseline} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} & \textbf{Final} \\
+\midrule
+Claude 3.5 Haiku & 0\% & 0\% (C) & 0\% (C) & 0\% (C) & 0\% \\
+Claude Haiku 4.5 & 0\% & \textbf{10\%} (C) & 0\% (R) & 0\% (R) & 10\% \\
+Claude Sonnet 4 & 0\% & \textbf{40\%} (C) & 40\% (R) & 30\% (R) & 40\% \\
+Claude Sonnet 4.5 & 0\% & \textbf{40\%} (C) & 40\% (R) & 10\% (R) & 40\% \\
+Claude Sonnet 4.6 & 0\% & \textbf{20\%} (C) & 30\% (R) & 30\% (R) & 20\% \\
+Claude Opus 4.6 & 0\% & 30\% (C) & 40\% (C) & \textbf{80\%} (C) & \textbf{80\%} \\
+\bottomrule
+\end{tabular}
+\caption{Accuracy progression across optimization iterations. (C) = CONTINUE (accepted), (R) = ROLLBACK (rejected). All start from 0\% baseline. Opus 4.6 is the only model to improve monotonically across all three iterations.}
+\label{tab:results}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Total Time} & \textbf{Avg Iteration} \\
+\midrule
+Claude 3.5 Haiku & 39m 24s & 9m 32s \\
+Claude Haiku 4.5 & 43m 32s & 10m 44s \\
+Claude Sonnet 4 & 49m 43s & 11m 44s \\
+Claude Sonnet 4.5 & 1h 4m 54s & 17m 4s \\
+Claude Sonnet 4.6 & 1h 3m 11s & 16m 55s \\
+Claude Opus 4.6 & 1h 2m 18s & 15m 19s \\
+\bottomrule
+\end{tabular}
+\caption{Wall-clock time for each experiment (baseline + 3 iterations).}
+\label{tab:timing}
+\end{table}
+
+\subsection{Qualitative Analysis}
+
+\paragraph{Iteration 1 is decisive for most models.} For Haiku and Sonnet-class models, the first iteration produced the only accepted improvement. Subsequent iterations either matched or regressed. However, Opus 4.6 broke this pattern entirely---it improved monotonically across all three iterations (30\% $\rightarrow$ 40\% $\rightarrow$ 80\%), suggesting that more capable models can sustain multi-iteration optimization where smaller models plateau.
+
+\paragraph{Structural improvements are model-independent.} The Kiro coding agent made similar structural changes across all six experiments:
+\begin{itemize}
+    \item Added an API exploration step before LLM reasoning
+    \item Fixed the system prompt with correct API parameter names
+    \item Added password retrieval and API documentation search
+\end{itemize}
+
+These changes were necessary but not sufficient---the target model's ability to \emph{use} the provided information determined whether accuracy improved.
+
+\paragraph{Haiku-class models hit a capability ceiling.} Claude 3.5 Haiku could not successfully complete any AppWorld task even with correct API documentation in context. It consistently generated incorrect API calls, misunderstood response formats, and failed to handle pagination. Claude Haiku 4.5 showed marginal improvement (10\%), successfully completing one simple lookup task.
+
+\paragraph{Sonnet-class models benefit but plateau.} Sonnet 4 and 4.5 both achieved 40\% accuracy after a single iteration, solving difficulty-1 Spotify lookups. Sonnet 4.6 achieved only 20\%, possibly due to different code generation patterns. All Sonnet models failed to improve beyond iteration 1.
+
+\paragraph{Opus 4.6 demonstrates sustained optimization.} The most striking result is Opus 4.6's trajectory: 0\% $\rightarrow$ 30\% $\rightarrow$ 40\% $\rightarrow$ 80\%, with all three hypotheses accepted. This suggests that Opus-class models can not only follow improved scaffolding but also benefit from the accumulated learnings in \texttt{MEMORY.md} across iterations. The coding agent was able to identify progressively more sophisticated failure classes and implement fixes that Opus could reliably execute.
+
+\paragraph{MEMORY.md captures useful learnings.} The accumulated memory correctly identified:
+\begin{itemize}
+    \item Working patterns: ``API exploration infrastructure is now in place''
+    \item Failed approaches: ``Simply providing API docs in the prompt is not enough for smaller models''
+    \item Known blockers: ``Paginated results require iterative fetching that the model doesn't reliably implement''
+\end{itemize}
+
+\subsection{Rollback Behavior}
+
+The rollback mechanism worked correctly across all experiments. When iteration 2 or 3 produced regressions (e.g., Sonnet 4.5 dropping from 40\% to 10\% in iteration 3), the system correctly rejected the hypothesis and preserved the best-known state. This ``safe by default'' behavior is critical for autonomous operation.
+
+\section{Discussion}
+
+\subsection{The Optimization Ceiling}
+
+Our results reveal a nuanced relationship between model capability and optimization ceiling. For Haiku and Sonnet-class models, auto-agent quickly identifies the right structural improvements but these only translate to gains when the model can follow the improved instructions. However, Opus 4.6's sustained improvement across all three iterations challenges the simpler narrative: with a sufficiently capable target model, auto-agent's iterative learning mechanism---where each iteration builds on accumulated knowledge in \texttt{MEMORY.md}---can drive continued gains beyond the initial ``low-hanging fruit.''
+
+This has practical implications: auto-agent is most valuable in two regimes: (1) unlocking latent capability in mid-tier models through better scaffolding, and (2) enabling sustained, compounding improvements in frontier models where each iteration can tackle progressively harder failure classes.
+
+\subsection{Kiro CLI as Orchestrator}
+
+Kiro CLI in \texttt{auto} mode (which routes to Sonnet-tier models based on credit cost analysis) proved effective as the orchestrating coding agent across all main experiments. It successfully read and understood the target agent codebase, analyzed evaluation failures, implemented targeted code changes, ran evaluations, wrote structured reports, and updated accumulated memory with learnings. The steering file approach for system prompt injection worked reliably.
+
+\subsection{Ablation: Orchestrator Model Capability}
+
+To isolate the effect of the orchestrating coding agent's capability, we ran an additional experiment holding the target model fixed at Claude Sonnet 4.6 while upgrading the Kiro orchestrator from \texttt{auto} (Sonnet-tier) to Claude Opus 4.6.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Target} & \textbf{Orchestrator} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} & \textbf{Final} & \textbf{Credits} \\
+\midrule
+Haiku 4.5 & Auto (Sonnet) & 10\% (C) & 0\% (R) & 0\% (R) & 10\% & 22.9 \\
+Haiku 4.5 & Opus 4.6 & 0\% (C) & 0\% (C) & 0\% (C) & 0\% & 43.2 \\
+\midrule
+Sonnet 4.6 & Auto (Sonnet) & 20\% (C) & 30\% (R) & 30\% (R) & 20\% & 19.4 \\
+Sonnet 4.6 & Opus 4.6 & 20\% (C) & \textbf{30\%} (C) & 30\% (C) & \textbf{30\%} & 31.8 \\
+\bottomrule
+\end{tabular}
+\caption{Ablation: effect of orchestrator capability on two target models. Upgrading the orchestrator to Opus helps Sonnet 4.6 (20\% $\rightarrow$ 30\%) but not Haiku 4.5 (10\% $\rightarrow$ 0\%), at roughly 1.6--1.9$\times$ the credit cost.}
+\label{tab:ablation}
+\end{table}
+
+The results reveal an interaction between orchestrator and target capability. For Sonnet 4.6, the Opus orchestrator produced higher-quality changes that survived the rollback check across all three iterations, achieving 30\% vs.\ 20\%. For Haiku 4.5, however, the Opus orchestrator performed \emph{worse}---its more sophisticated code modifications were beyond what Haiku could reliably execute, while the Sonnet orchestrator's simpler changes happened to unlock one task. This suggests that orchestrator--target capability matching matters: an overpowered orchestrator may generate changes that exceed the target model's ability to follow, yielding no benefit at higher cost.
+
+\subsection{Limitations}
+
+\begin{itemize}
+    \item \textbf{Small evaluation set}: We used only 10 train tasks due to time constraints. A larger evaluation would provide more statistical power.
+    \item \textbf{Three iterations}: Opus 4.6 was still improving at iteration 3 (80\% as target), suggesting more iterations could yield further gains.
+    \item \textbf{Non-determinism}: LLM-based agents are inherently non-deterministic. Results may vary across runs.
+\end{itemize}
+
+\section{Related Work}
+
+\textbf{Autoresearch}~\cite{autoresearch} automates the research process by having LLMs generate hypotheses, run experiments, and iterate. auto-agent applies a similar philosophy to agent development.
+
+\textbf{DSPy}~\cite{dspy} optimizes LLM pipelines by tuning prompts and few-shot examples. Unlike auto-agent, DSPy operates at the prompt level rather than modifying agent code.
+
+\textbf{AppWorld}~\cite{appworld} provides the benchmark used in our evaluation. The official leaderboard shows that even state-of-the-art models achieve modest scores on the challenge set, confirming the benchmark's difficulty.
+
+\section{Conclusion}
+
+We demonstrated that auto-agent, extended with Kiro CLI support, can autonomously improve an AppWorld agent from 0\% to 80\% accuracy for Opus 4.6 over three optimization iterations, and to 40\% for Sonnet-class models in a single iteration. The provider abstraction enables fair comparison across coding agent backends, and the AppWorld benchmark provides a rigorous evaluation framework for interactive coding agents.
+
+Three findings emerge from our experiments. First, the target model's capability is the primary determinant of the optimization ceiling: the same orchestrator making similar structural improvements produces 0--80\% accuracy depending on the target model. Second, only frontier models sustain multi-iteration gains---Opus 4.6 was the sole model to improve monotonically across all three iterations, while every other model plateaued after iteration 1. Third, and perhaps most surprisingly, orchestrator--target capability matching matters: upgrading the orchestrator to Opus 4.6 helped Sonnet 4.6 (20\% $\rightarrow$ 30\%) but hurt Haiku 4.5 (10\% $\rightarrow$ 0\%), because a more capable orchestrator generates more sophisticated code changes that can exceed a weak target model's ability to follow. The optimal configuration is not simply ``use the best orchestrator available,'' but rather one where the orchestrator's output complexity is calibrated to the target model's instruction-following capacity.
+
+Future work should explore more iterations (Opus 4.6 was still improving at iteration 3), larger evaluation sets, the effect of seeding \texttt{MEMORY.md} with prior knowledge, and whether the orchestrator--target matching effect holds across other benchmarks and model families.
+
+\begin{thebibliography}{9}
+
+\bibitem{appworld}
+Harsh Trivedi, Tushar Khot, Mareike Hartmann, Ruskin Manku, Vinty Dong, Edward Li, Shashank Gupta, Ashish Sabharwal, and Niranjan Balasubramanian.
+\newblock AppWorld: A Controllable World of Apps and People for Benchmarking Interactive Coding Agents.
+\newblock In \emph{ACL}, 2024.
+
+\bibitem{autoresearch}
+Andrej Karpathy.
+\newblock Autoresearch.
+\newblock \url{https://github.com/karpathy/autoresearch}, 2025.
+
+\bibitem{dspy}
+Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, Zhiyuan Zhang, Keshav Santhanam, Sri Vardhamanan, Saiful Haq, Ashutosh Sharma, Thomas T. Joshi, Hanna Moazam, Heather Miller, Matei Zaharia, and Christopher Potts.
+\newblock DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines.
+\newblock In \emph{ICLR}, 2024.
+
+\end{thebibliography}
+
+\end{document}

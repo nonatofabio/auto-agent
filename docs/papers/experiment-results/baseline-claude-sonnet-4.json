@@ -1,0 +1,155 @@
+{
+  "summary": {
+    "accuracy": 0.0,
+    "total_cases": 10,
+    "passed_cases": 0,
+    "failed_cases": 10
+  },
+  "cases": [
+    {
+      "id": "82e2fac_1",
+      "success": false,
+      "instruction": "What is the title of the most-liked song in my Spotify playlists.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "82e2fac_2",
+      "success": false,
+      "instruction": "What is the title of the least-played song in my Spotify song library.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "82e2fac_3",
+      "success": false,
+      "instruction": "What is the title of the most-played song in my Spotify album library.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "692c77d_1",
+      "success": false,
+      "instruction": "Give a 5-star rating to all songs in my Spotify playlists which I have liked. If I have already rated it lower, increase it to 5.",
+      "num_tests": 7,
+      "passes": 2,
+      "failures": 5,
+      "failure_details": [
+        "assert model changes match spotify.SongReview.",
+        "assert song_ids of the updated song reviews match private_data.to_update_review_song_ids (ignore_order)",
+        "assert song_ids of the added song reviews match private_data.to_add_review_song_ids (ignore_order)",
+        "assert all added_review_song_ids have rating of public_data.target_rating.",
+        "assert all updated_review_song_ids have rating of public_data.target_rating."
+      ]
+    },
+    {
+      "id": "692c77d_2",
+      "success": false,
+      "instruction": "Give a 1-star rating to all songs in my Spotify song library which I have not liked. If I have already rated it higher, decrease it to 1.",
+      "num_tests": 7,
+      "passes": 1,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.SongReview.",
+        "assert song_ids of the updated song reviews match private_data.to_update_review_song_ids (ignore_order)",
+        "assert song_ids of the added song reviews match private_data.to_add_review_song_ids (ignore_order)",
+        "assert all added_review_song_ids have rating of public_data.target_rating.",
+        "assert all updated_review_song_ids have rating of public_data.target_rating."
+      ]
+    },
+    {
+      "id": "692c77d_3",
+      "success": false,
+      "instruction": "Give a 4-star rating to all songs in my Spotify album library which I have liked. If I have already rated it lower, increase it to 4.",
+      "num_tests": 7,
+      "passes": 1,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.SongReview.",
+        "assert song_ids of the updated song reviews match private_data.to_update_review_song_ids (ignore_order)",
+        "assert song_ids of the added song reviews match private_data.to_add_review_song_ids (ignore_order)",
+        "assert all added_review_song_ids have rating of public_data.target_rating.",
+        "assert all updated_review_song_ids have rating of public_data.target_rating."
+      ]
+    },
+    {
+      "id": "2a163ab_1",
+      "success": false,
+      "instruction": "Like all the venmo transactions from today involving any of my roommates on my venmo social feed.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike",
+        "assert set of all new transaction likes (obtained via models.changed_records)\nis identical to set of private_data.recent_relative_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.recent_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.relative_transaction_ids."
+      ]
+    },
+    {
+      "id": "2a163ab_2",
+      "success": false,
+      "instruction": "Like all the venmo transactions from yesterday involving any of my siblings on my venmo social feed.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike",
+        "assert set of all new transaction likes (obtained via models.changed_records)\nis identical to set of private_data.recent_relative_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.recent_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.relative_transaction_ids."
+      ]
+    },
+    {
+      "id": "2a163ab_3",
+      "success": false,
+      "instruction": "Like all the venmo transactions from yesterday or today involving any of my coworkers on my venmo social feed.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike",
+        "assert set of all new transaction likes (obtained via models.changed_records)\nis identical to set of private_data.recent_relative_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.recent_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.relative_transaction_ids."
+      ]
+    },
+    {
+      "id": "6104387_1",
+      "success": false,
+      "instruction": "Export a unique list of all the songs in my song and album library and all playlists in my Spotify account into \"~/backups/spotify.csv\" file in my file system. The file should have headers, \"Title\" an",
+      "num_tests": 10,
+      "passes": 0,
+      "failures": 10,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.User, file_system.File, file_system.Directory\nignoring spotify.SongReview,spotify.UserLibrarySong,\nspotify.UserDownloadedSong,spotify.PaymentCard,spotify.User,spotify.AlbumReview,\nfile_system.Directory,spotify.Album,spotify.Recommendation,spotify.MusicPlayer,\nspotify.Playlist,spotify.UserArtistFollowing,spotify.UserLibraryAlbum,spotify.Song\nspotify.PlaylistReview, spotify.PremiumSubscription",
+        "obtain added, updated, removed file_system.File records using models.changed_records,\nand assert 1 has been added, 0 have been updated or removed.",
+        "assert the added file's path is public_data.backup_file_path.",
+        "parse the content of the file into lines and\nassert the first line of the parsed csv lines is \"Title, Artists\"\nwith ignore_white_space=True, ignore_case=True.",
+        "make a dict of song_title_to_artist_names from the csv_lines and assert it\nmatches private_data.song_title_to_artist_names (ignore_order, normalize_text).",
+        "assert keys of song_title_to_artist_names match keys of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert values of song_title_to_artist_names match values of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert each song_title in csv_lines is mentioned only once.",
+        "obtain updated, deleted spotify.User records using models.changed_records,\nand assert 1 has been deleted, 0 have been added or updated."
+      ]
+    }
+  ]
+}

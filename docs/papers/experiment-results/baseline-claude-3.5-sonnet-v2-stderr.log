@@ -1,0 +1,160 @@
+--- Task 1/10: 82e2fac_1 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/2 tests
+--- Task 2/10: 82e2fac_2 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/2 tests
+--- Task 3/10: 82e2fac_3 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/2 tests
+--- Task 4/10: 692c77d_1 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/7 tests
+--- Task 5/10: 692c77d_2 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/7 tests
+--- Task 6/10: 692c77d_3 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/7 tests
+--- Task 7/10: 2a163ab_1 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/6 tests
+--- Task 8/10: 2a163ab_2 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/6 tests
+--- Task 9/10: 2a163ab_3 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 1/6 tests
+--- Task 10/10: 6104387_1 ---
+  Agent error: LLM call failed: Traceback (most recent call last):
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/src/llm_call.py", line 13, in <module>
+    response = client.converse(
+               ^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 602, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fnp/Documents/wd/dev/Velocity/src/memories/src/appworld-agent/.venv/lib/python3.11/site-packages/botocore/client.py", line 1078, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the Converse operation: Invocation of model ID anthropic.claude-3-5-sonnet-20241022-v2:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.
+
+  ✗ 0/10 tests
