@@ -1,0 +1,29 @@
+FROM amazonlinux:2023
+
+# System deps
+RUN dnf install -y git tar gzip python3.11 python3.11-pip nodejs22 npm10 && dnf clean all
+
+# Kiro CLI
+RUN curl -fsSL https://kiro.dev/install.sh | bash
+
+# Working dirs
+WORKDIR /workspace
+
+# Copy auto-agent
+COPY auto-agent /workspace/auto-agent
+RUN cd /workspace/auto-agent && npm install
+
+# Set up appworld-agent with venv
+COPY appworld-agent /workspace/appworld-agent
+RUN cd /workspace/appworld-agent && \
+    python3.11 -m venv .venv && \
+    .venv/bin/pip install --upgrade pip && \
+    .venv/bin/pip install appworld boto3
+
+# Install and download appworld data
+RUN cd /workspace/appworld-agent && \
+    .venv/bin/appworld install && \
+    .venv/bin/appworld download data
+
+# Entry
+CMD ["bash"]

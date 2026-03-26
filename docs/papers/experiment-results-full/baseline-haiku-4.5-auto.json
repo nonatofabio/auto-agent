@@ -1,0 +1,1290 @@
+{
+  "summary": {
+    "accuracy": 0.0,
+    "total_cases": 90,
+    "passed_cases": 0,
+    "failed_cases": 90
+  },
+  "cases": [
+    {
+      "id": "07b42fd_1",
+      "success": false,
+      "instruction": "Follow all the classical artists on Spotify that have at least 22 followers.",
+      "num_tests": 5,
+      "passes": 1,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.ArtistFollowing.",
+        "assert all artists from added artist follows are of public_data.genre genre.",
+        "assert all artists from added artist follows have >= public_data.min_followers followers."
+      ]
+    },
+    {
+      "id": "07b42fd_2",
+      "success": false,
+      "instruction": "Follow all the edm artists on Spotify that have at least 23 followers.",
+      "num_tests": 5,
+      "passes": 1,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.ArtistFollowing.",
+        "assert all artists from added artist follows are of public_data.genre genre.",
+        "assert all artists from added artist follows have >= public_data.min_followers followers."
+      ]
+    },
+    {
+      "id": "07b42fd_3",
+      "success": false,
+      "instruction": "Follow all the reggae artists on Spotify that have at least 21 followers.",
+      "num_tests": 5,
+      "passes": 1,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.ArtistFollowing.",
+        "assert all artists from added artist follows are of public_data.genre genre.",
+        "assert all artists from added artist follows have >= public_data.min_followers followers."
+      ]
+    },
+    {
+      "id": "229360a_1",
+      "success": false,
+      "instruction": "I need to cleanup my Spotify libraries. Keep only those songs and albums in my song and album library, respectively, that I have liked or downloaded, and remove the rest. An album is downloaded if all",
+      "num_tests": 6,
+      "passes": 3,
+      "failures": 3,
+      "failure_details": [
+        "assert model changes match spotify.UserLibrarySong, spotify.UserLibraryAlbum.",
+        "assert all removed song_ids match private_data.to_remove_library_song_ids (ignore_order)",
+        "assert all removed album_ids match private_data.to_remove_library_album_ids (ignore_order)"
+      ]
+    },
+    {
+      "id": "229360a_2",
+      "success": false,
+      "instruction": "I need to cleanup my Spotify libraries. Keep only those songs and albums in my song and album library, respectively, that I have liked and downloaded, and remove the rest. An album is downloaded if al",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserLibrarySong, spotify.UserLibraryAlbum.",
+        "assert all removed song_ids match private_data.to_remove_library_song_ids (ignore_order)",
+        "assert all removed album_ids match private_data.to_remove_library_album_ids (ignore_order)"
+      ]
+    },
+    {
+      "id": "229360a_3",
+      "success": false,
+      "instruction": "I need to cleanup my Spotify libraries. Keep only those songs and albums in my song and album library, respectively, that I have liked or downloaded, and remove the rest. An album is downloaded if all",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserLibrarySong, spotify.UserLibraryAlbum.",
+        "assert all removed song_ids match private_data.to_remove_library_song_ids (ignore_order)",
+        "assert all removed album_ids match private_data.to_remove_library_album_ids (ignore_order)"
+      ]
+    },
+    {
+      "id": "22cc237_1",
+      "success": false,
+      "instruction": "I went on a dinner with some of my coworkers yesterday. I paid the entire bill to simplify the payment. I've made a note of individual shares in simple note. Some people have already sent me their sha",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Notification, venmo.PaymentRequest.",
+        "assert user_id_to_share obtained from added_payment_requests matches\nthe private_data.pending_user_id_to_share (tolerance=1.0)"
+      ]
+    },
+    {
+      "id": "22cc237_2",
+      "success": false,
+      "instruction": "I went on a dinner with some of my friends yesterday. I paid the entire bill to simplify the payment. I've made a note of individual shares in simple note. Some people have already sent me their share",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Notification, venmo.PaymentRequest.",
+        "assert user_id_to_share obtained from added_payment_requests matches\nthe private_data.pending_user_id_to_share (tolerance=1.0)"
+      ]
+    },
+    {
+      "id": "22cc237_3",
+      "success": false,
+      "instruction": "I went on a dinner with some of my coworkers yesterday. I paid the entire bill to simplify the payment. I've made a note of individual shares in simple note. Some people have already sent me their sha",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Notification, venmo.PaymentRequest.",
+        "assert user_id_to_share obtained from added_payment_requests matches\nthe private_data.pending_user_id_to_share (tolerance=1.0)"
+      ]
+    },
+    {
+      "id": "27e1026_1",
+      "success": false,
+      "instruction": "What is the title of the oldest released song in my Spotify account from across my song, album and playlist libraries?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "27e1026_2",
+      "success": false,
+      "instruction": "What is the title of the newest released song in my Spotify account from across my song, album and playlist libraries?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "27e1026_3",
+      "success": false,
+      "instruction": "What is the title of the oldest released song in my Spotify account from across my song, album and playlist libraries?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "287e338_1",
+      "success": false,
+      "instruction": "Name the artist most recommended to me on Spotify.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "287e338_2",
+      "success": false,
+      "instruction": "Name the artist least recommended to me on Spotify.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "287e338_3",
+      "success": false,
+      "instruction": "",
+      "num_tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "failure_details": [
+        "'_freeze_time' object has no attribute 'fake_names'"
+      ]
+    },
+    {
+      "id": "29caf6f_1",
+      "success": false,
+      "instruction": "Christopher has asked for my movie recommendations via phone text message. Reply to them with a list of comma-separated movie titles from my Simple Note account as per their request.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.GlobalTextMessage, phone.UserTextMessage.",
+        "obtain 1 phone.GlobalTextMessage record was added using models.changed_records.",
+        "assert the added global_text_message has private_data.related_person_phone_user_id as the receiver_id.",
+        "assert the receiver of the added global_text_message is the related_person\ncorresponding to data.public.related_person_first_name.",
+        "assert that all private_data.director_movie_titles occur as a substring in\nadded global_text_message (normalize_text=True)",
+        "assert that none of private_data.non_director_movie_titles occur as a substring in\nadded global_text_message (normalize_text=True)"
+      ]
+    },
+    {
+      "id": "29caf6f_2",
+      "success": false,
+      "instruction": "Laura has asked for my movie recommendations via phone text message. Reply to them with a list of comma-separated movie titles from my Simple Note account as per their request.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.GlobalTextMessage, phone.UserTextMessage.",
+        "obtain 1 phone.GlobalTextMessage record was added using models.changed_records.",
+        "assert the added global_text_message has private_data.related_person_phone_user_id as the receiver_id.",
+        "assert the receiver of the added global_text_message is the related_person\ncorresponding to data.public.related_person_first_name.",
+        "assert that all private_data.director_movie_titles occur as a substring in\nadded global_text_message (normalize_text=True)",
+        "assert that none of private_data.non_director_movie_titles occur as a substring in\nadded global_text_message (normalize_text=True)"
+      ]
+    },
+    {
+      "id": "29caf6f_3",
+      "success": false,
+      "instruction": "Leslie has asked for my movie recommendations via phone text message. Reply to them with a list of comma-separated movie titles from my Simple Note account as per their request.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.GlobalTextMessage, phone.UserTextMessage.",
+        "obtain 1 phone.GlobalTextMessage record was added using models.changed_records.",
+        "assert the added global_text_message has private_data.related_person_phone_user_id as the receiver_id.",
+        "assert the receiver of the added global_text_message is the related_person\ncorresponding to data.public.related_person_first_name.",
+        "assert that all private_data.director_movie_titles occur as a substring in\nadded global_text_message (normalize_text=True)",
+        "assert that none of private_data.non_director_movie_titles occur as a substring in\nadded global_text_message (normalize_text=True)"
+      ]
+    },
+    {
+      "id": "2a163ab_1",
+      "success": false,
+      "instruction": "Like all the venmo transactions from today involving any of my roommates on my venmo social feed.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike",
+        "assert set of all new transaction likes (obtained via models.changed_records)\nis identical to set of private_data.recent_relative_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.recent_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.relative_transaction_ids."
+      ]
+    },
+    {
+      "id": "2a163ab_2",
+      "success": false,
+      "instruction": "Like all the venmo transactions from yesterday involving any of my siblings on my venmo social feed.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike",
+        "assert set of all new transaction likes (obtained via models.changed_records)\nis identical to set of private_data.recent_relative_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.recent_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.relative_transaction_ids."
+      ]
+    },
+    {
+      "id": "2a163ab_3",
+      "success": false,
+      "instruction": "Like all the venmo transactions from yesterday or today involving any of my coworkers on my venmo social feed.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike",
+        "assert set of all new transaction likes (obtained via models.changed_records)\nis identical to set of private_data.recent_relative_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.recent_transaction_ids.",
+        "assert all newly liked transaction_ids are in private_data.relative_transaction_ids."
+      ]
+    },
+    {
+      "id": "302c169_1",
+      "success": false,
+      "instruction": "I am going on a vacation. Move my go-to-sleep phone alarm to 1 hour later and disable the rest.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.Alarm.",
+        "assert the updated alarms' ids match the union of\nprivate_data.target_alarm_id and private_data.to_disable_alarm_ids.",
+        "assert the only changed field in target_alarm_id alarm is \"time\".",
+        "assert the updated time in private_data.target_alarm_id alarm matches private_data.updated_time.",
+        "assert all alarms from to_disable_alarm_ids are disabled now.",
+        "assert all alarms from to_disable_alarm_ids have changed in only \"enabled\" field."
+      ]
+    },
+    {
+      "id": "302c169_2",
+      "success": false,
+      "instruction": "I am going on a vacation. Move my wake-up phone alarm to 40 minutes earlier and disable the rest.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.Alarm.",
+        "assert the updated alarms' ids match the union of\nprivate_data.target_alarm_id and private_data.to_disable_alarm_ids.",
+        "assert the only changed field in target_alarm_id alarm is \"time\".",
+        "assert the updated time in private_data.target_alarm_id alarm matches private_data.updated_time.",
+        "assert all alarms from to_disable_alarm_ids are disabled now.",
+        "assert all alarms from to_disable_alarm_ids have changed in only \"enabled\" field."
+      ]
+    },
+    {
+      "id": "302c169_3",
+      "success": false,
+      "instruction": "I am going on a vacation. Move my go-to-sleep phone alarm to 20 minutes later and disable the rest.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.Alarm.",
+        "assert the updated alarms' ids match the union of\nprivate_data.target_alarm_id and private_data.to_disable_alarm_ids.",
+        "assert the only changed field in target_alarm_id alarm is \"time\".",
+        "assert the updated time in private_data.target_alarm_id alarm matches private_data.updated_time.",
+        "assert all alarms from to_disable_alarm_ids are disabled now.",
+        "assert all alarms from to_disable_alarm_ids have changed in only \"enabled\" field."
+      ]
+    },
+    {
+      "id": "34d9492_1",
+      "success": false,
+      "instruction": "Arrange my \"~/photographs/vacations/\" directory by organizing the photos from three vacations. The files created in February and March of this year correspond to Petra and Budapest, respectively, whil",
+      "num_tests": 5,
+      "passes": 3,
+      "failures": 2,
+      "failure_details": [
+        "assert model changes match file_system.File.",
+        "prepare start_file_path_to_content and end_file_path_to_content from start and end\nstate of user.files, then assert the files have been renamed (with proper content) as per\nprivate_data.start_to_end_file_path. Also lowercase the paths first."
+      ]
+    },
+    {
+      "id": "34d9492_2",
+      "success": false,
+      "instruction": "Arrange my \"~/photographs/vacations/\" directory by organizing the photos from three vacations. The files created in March and April of this year correspond to Rome and Santorini, respectively, while t",
+      "num_tests": 5,
+      "passes": 3,
+      "failures": 2,
+      "failure_details": [
+        "assert model changes match file_system.File.",
+        "prepare start_file_path_to_content and end_file_path_to_content from start and end\nstate of user.files, then assert the files have been renamed (with proper content) as per\nprivate_data.start_to_end_file_path. Also lowercase the paths first."
+      ]
+    },
+    {
+      "id": "34d9492_3",
+      "success": false,
+      "instruction": "Arrange my \"~/photographs/vacations/\" directory by organizing the photos from three vacations. The files created in January and April of this year correspond to Athens and Seoul, respectively, while t",
+      "num_tests": 5,
+      "passes": 3,
+      "failures": 2,
+      "failure_details": [
+        "assert model changes match file_system.File.",
+        "prepare start_file_path_to_content and end_file_path_to_content from start and end\nstate of user.files, then assert the files have been renamed (with proper content) as per\nprivate_data.start_to_end_file_path. Also lowercase the paths first."
+      ]
+    },
+    {
+      "id": "3c13f5a_1",
+      "success": false,
+      "instruction": "I paid for our last month's electricity bill. Its amount is supposed to be shared equally among my roommates and me. Make venmo requests to my roommates, with a description note, \"For electricity bill",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert model changes match venmo.Notification, venmo.PaymentRequest.",
+        "assert all added payment requests's receivers match private_data.roommate_venmo_user_ids.",
+        "assert all added payment requests's amounts\nmatch private_data.this_month_bill_share (tolerance=0.51)",
+        "assert all added payment requests's notes match public_data.note (normalize_text=True)."
+      ]
+    },
+    {
+      "id": "3c13f5a_2",
+      "success": false,
+      "instruction": "I paid for our last month's internet bill. Its amount is supposed to be shared equally among my roommates and me. Make venmo requests to my roommates, with a description note, \"internet bill for the l",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert model changes match venmo.Notification, venmo.PaymentRequest.",
+        "assert all added payment requests's receivers match private_data.roommate_venmo_user_ids.",
+        "assert all added payment requests's amounts\nmatch private_data.this_month_bill_share (tolerance=0.51)",
+        "assert all added payment requests's notes match public_data.note (normalize_text=True)."
+      ]
+    },
+    {
+      "id": "3c13f5a_3",
+      "success": false,
+      "instruction": "I paid for our last month's cable bill. Its amount is supposed to be shared equally among my roommates and me. Make venmo requests to my roommates, with a description note, \"I paid for cable bill.\". T",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Notification, venmo.PaymentRequest.",
+        "assert all added payment requests's receivers match private_data.roommate_venmo_user_ids.",
+        "assert all added payment requests's amounts\nmatch private_data.this_month_bill_share (tolerance=0.51)",
+        "assert all added payment requests's notes match public_data.note (normalize_text=True)."
+      ]
+    },
+    {
+      "id": "60d0b5b_1",
+      "success": false,
+      "instruction": "The last Venmo payment request I sent to Robert was an accident and they approved it. Send them the money back.",
+      "num_tests": 7,
+      "passes": 0,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.Notification, venmo.User.",
+        "obtain added, updated, removed venmo.Transaction records using models.changed_records,\nand assert 1 is added, 0 is updated, and 0 is deleted.",
+        "assert the added transaction's receiver_id is private_data.person_venmo_user_id.",
+        "assert the added transaction has amount private_data.accident_cost.",
+        "obtain added, updated, removed venmo.User using models.changed_records,\nand assert 0 is added, >= 1 is updated, and 0 is deleted.",
+        "assert the changed_field_names of all updated users only include venmo_balance."
+      ]
+    },
+    {
+      "id": "60d0b5b_2",
+      "success": false,
+      "instruction": "The last Venmo payment request I sent to Cory was an accident and they approved it. Send them the money back.",
+      "num_tests": 7,
+      "passes": 0,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.Notification, venmo.User.",
+        "obtain added, updated, removed venmo.Transaction records using models.changed_records,\nand assert 1 is added, 0 is updated, and 0 is deleted.",
+        "assert the added transaction's receiver_id is private_data.person_venmo_user_id.",
+        "assert the added transaction has amount private_data.accident_cost.",
+        "obtain added, updated, removed venmo.User using models.changed_records,\nand assert 0 is added, >= 1 is updated, and 0 is deleted.",
+        "assert the changed_field_names of all updated users only include venmo_balance."
+      ]
+    },
+    {
+      "id": "60d0b5b_3",
+      "success": false,
+      "instruction": "The last Venmo payment request I sent to Brandon was an accident and they approved it. Send them the money back.",
+      "num_tests": 7,
+      "passes": 0,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.Notification, venmo.User.",
+        "obtain added, updated, removed venmo.Transaction records using models.changed_records,\nand assert 1 is added, 0 is updated, and 0 is deleted.",
+        "assert the added transaction's receiver_id is private_data.person_venmo_user_id.",
+        "assert the added transaction has amount private_data.accident_cost.",
+        "obtain added, updated, removed venmo.User using models.changed_records,\nand assert 0 is added, >= 1 is updated, and 0 is deleted.",
+        "assert the changed_field_names of all updated users only include venmo_balance."
+      ]
+    },
+    {
+      "id": "6104387_1",
+      "success": false,
+      "instruction": "Export a unique list of all the songs in my song and album library and all playlists in my Spotify account into \"~/backups/spotify.csv\" file in my file system. The file should have headers, \"Title\" an",
+      "num_tests": 10,
+      "passes": 0,
+      "failures": 10,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.User, file_system.File, file_system.Directory\nignoring spotify.SongReview,spotify.UserLibrarySong,\nspotify.UserDownloadedSong,spotify.PaymentCard,spotify.User,spotify.AlbumReview,\nfile_system.Directory,spotify.Album,spotify.Recommendation,spotify.MusicPlayer,\nspotify.Playlist,spotify.UserArtistFollowing,spotify.UserLibraryAlbum,spotify.Song\nspotify.PlaylistReview, spotify.PremiumSubscription",
+        "obtain added, updated, removed file_system.File records using models.changed_records,\nand assert 1 has been added, 0 have been updated or removed.",
+        "assert the added file's path is public_data.backup_file_path.",
+        "parse the content of the file into lines and\nassert the first line of the parsed csv lines is \"Title, Artists\"\nwith ignore_white_space=True, ignore_case=True.",
+        "make a dict of song_title_to_artist_names from the csv_lines and assert it\nmatches private_data.song_title_to_artist_names (ignore_order, normalize_text).",
+        "assert keys of song_title_to_artist_names match keys of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert values of song_title_to_artist_names match values of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert each song_title in csv_lines is mentioned only once.",
+        "obtain updated, deleted spotify.User records using models.changed_records,\nand assert 1 has been deleted, 0 have been added or updated."
+      ]
+    },
+    {
+      "id": "6104387_2",
+      "success": false,
+      "instruction": "Export a unique list of all the songs in my song and album library and all playlists in my Spotify account into \"~/backups/spotify_library.csv\" file in my file system. The file should have headers, \"T",
+      "num_tests": 10,
+      "passes": 0,
+      "failures": 10,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.User, file_system.File, file_system.Directory\nignoring spotify.SongReview,spotify.UserLibrarySong,\nspotify.UserDownloadedSong,spotify.PaymentCard,spotify.User,spotify.AlbumReview,\nfile_system.Directory,spotify.Album,spotify.Recommendation,spotify.MusicPlayer,\nspotify.Playlist,spotify.UserArtistFollowing,spotify.UserLibraryAlbum,spotify.Song\nspotify.PlaylistReview, spotify.PremiumSubscription",
+        "obtain added, updated, removed file_system.File records using models.changed_records,\nand assert 1 has been added, 0 have been updated or removed.",
+        "assert the added file's path is public_data.backup_file_path.",
+        "parse the content of the file into lines and\nassert the first line of the parsed csv lines is \"Title, Artists\"\nwith ignore_white_space=True, ignore_case=True.",
+        "make a dict of song_title_to_artist_names from the csv_lines and assert it\nmatches private_data.song_title_to_artist_names (ignore_order, normalize_text).",
+        "assert keys of song_title_to_artist_names match keys of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert values of song_title_to_artist_names match values of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert each song_title in csv_lines is mentioned only once.",
+        "obtain updated, deleted spotify.User records using models.changed_records,\nand assert 1 has been deleted, 0 have been added or updated."
+      ]
+    },
+    {
+      "id": "6104387_3",
+      "success": false,
+      "instruction": "Export a unique list of all the songs in my song and album library and all playlists in my Spotify account into \"~/backups/spotify_songs.csv\" file in my file system. The file should have headers, \"Tit",
+      "num_tests": 10,
+      "passes": 0,
+      "failures": 10,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.User, file_system.File, file_system.Directory\nignoring spotify.SongReview,spotify.UserLibrarySong,\nspotify.UserDownloadedSong,spotify.PaymentCard,spotify.User,spotify.AlbumReview,\nfile_system.Directory,spotify.Album,spotify.Recommendation,spotify.MusicPlayer,\nspotify.Playlist,spotify.UserArtistFollowing,spotify.UserLibraryAlbum,spotify.Song\nspotify.PlaylistReview, spotify.PremiumSubscription",
+        "obtain added, updated, removed file_system.File records using models.changed_records,\nand assert 1 has been added, 0 have been updated or removed.",
+        "assert the added file's path is public_data.backup_file_path.",
+        "parse the content of the file into lines and\nassert the first line of the parsed csv lines is \"Title, Artists\"\nwith ignore_white_space=True, ignore_case=True.",
+        "make a dict of song_title_to_artist_names from the csv_lines and assert it\nmatches private_data.song_title_to_artist_names (ignore_order, normalize_text).",
+        "assert keys of song_title_to_artist_names match keys of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert values of song_title_to_artist_names match values of private_data.song_title_to_artist_names\n(ignore_order, normalize_text).",
+        "assert each song_title in csv_lines is mentioned only once.",
+        "obtain updated, deleted spotify.User records using models.changed_records,\nand assert 1 has been deleted, 0 have been added or updated."
+      ]
+    },
+    {
+      "id": "692c77d_1",
+      "success": false,
+      "instruction": "Give a 5-star rating to all songs in my Spotify playlists which I have liked. If I have already rated it lower, increase it to 5.",
+      "num_tests": 7,
+      "passes": 2,
+      "failures": 5,
+      "failure_details": [
+        "assert model changes match spotify.SongReview.",
+        "assert song_ids of the updated song reviews match private_data.to_update_review_song_ids (ignore_order)",
+        "assert song_ids of the added song reviews match private_data.to_add_review_song_ids (ignore_order)",
+        "assert all added_review_song_ids have rating of public_data.target_rating.",
+        "assert all updated_review_song_ids have rating of public_data.target_rating."
+      ]
+    },
+    {
+      "id": "692c77d_2",
+      "success": false,
+      "instruction": "Give a 1-star rating to all songs in my Spotify song library which I have not liked. If I have already rated it higher, decrease it to 1.",
+      "num_tests": 7,
+      "passes": 1,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.SongReview.",
+        "assert song_ids of the updated song reviews match private_data.to_update_review_song_ids (ignore_order)",
+        "assert song_ids of the added song reviews match private_data.to_add_review_song_ids (ignore_order)",
+        "assert all added_review_song_ids have rating of public_data.target_rating.",
+        "assert all updated_review_song_ids have rating of public_data.target_rating."
+      ]
+    },
+    {
+      "id": "692c77d_3",
+      "success": false,
+      "instruction": "Give a 4-star rating to all songs in my Spotify album library which I have liked. If I have already rated it lower, increase it to 4.",
+      "num_tests": 7,
+      "passes": 1,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.SongReview.",
+        "assert song_ids of the updated song reviews match private_data.to_update_review_song_ids (ignore_order)",
+        "assert song_ids of the added song reviews match private_data.to_add_review_song_ids (ignore_order)",
+        "assert all added_review_song_ids have rating of public_data.target_rating.",
+        "assert all updated_review_song_ids have rating of public_data.target_rating."
+      ]
+    },
+    {
+      "id": "6ea6792_1",
+      "success": false,
+      "instruction": "Accept all pending Venmo payment requests from my roommates and coworkers.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Notification, venmo.PaymentRequest,\nignoring venmo.User, venmo.Transaction.",
+        "assert set of updated payment request ids match exactly\nto private_data.to_accept_payment_request_ids (ignore order).",
+        "if public_data.accept_reject is \"accept\", assert all these payment request\nare approved in the end state, otherwise,\nassert all these payment request are rejected in the end state.",
+        "if public_data.accept_reject is \"accept\", assert only field that has changed in these\npayment_requests is approved_at using models.changed_field_names. otherwise,\nassert only field that has changed in these payment_requests is denied_at using models.changed_field_names."
+      ]
+    },
+    {
+      "id": "6ea6792_2",
+      "success": false,
+      "instruction": "Reject all pending Venmo payment requests from my friends and roommates.",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert model changes match venmo.Notification, venmo.PaymentRequest,\nignoring venmo.User, venmo.Transaction.",
+        "assert set of updated payment request ids match exactly\nto private_data.to_accept_payment_request_ids (ignore order).",
+        "if public_data.accept_reject is \"accept\", assert all these payment request\nare approved in the end state, otherwise,\nassert all these payment request are rejected in the end state.",
+        "if public_data.accept_reject is \"accept\", assert only field that has changed in these\npayment_requests is approved_at using models.changed_field_names. otherwise,\nassert only field that has changed in these payment_requests is denied_at using models.changed_field_names."
+      ]
+    },
+    {
+      "id": "6ea6792_3",
+      "success": false,
+      "instruction": "Accept all pending Venmo payment requests from my coworkers and friends.",
+      "num_tests": 6,
+      "passes": 1,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Notification, venmo.PaymentRequest,\nignoring venmo.User, venmo.Transaction.",
+        "assert set of updated payment request ids match exactly\nto private_data.to_accept_payment_request_ids (ignore order).",
+        "if public_data.accept_reject is \"accept\", assert all these payment request\nare approved in the end state, otherwise,\nassert all these payment request are rejected in the end state.",
+        "if public_data.accept_reject is \"accept\", assert only field that has changed in these\npayment_requests is approved_at using models.changed_field_names. otherwise,\nassert only field that has changed in these payment_requests is denied_at using models.changed_field_names."
+      ]
+    },
+    {
+      "id": "76f2c72_1",
+      "success": false,
+      "instruction": "What is the total cost of my electricity bills for this year? The bills are in \"~/bills/\" directory of my file system.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "76f2c72_2",
+      "success": false,
+      "instruction": "What is the total cost of my internet bills for this year? The bills are in \"~/bills/\" directory of my file system.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "76f2c72_3",
+      "success": false,
+      "instruction": "What is the total cost of my cable bills for this year? The bills are in \"~/bills/\" directory of my file system.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "771d8fc_1",
+      "success": false,
+      "instruction": "All phone text messages and voice messages from 3654328626 are spam, delete them.",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.UserTextMessage, phone.UserVoiceMessage.",
+        "assert their ids match private_data.to_delete_text_message_ids (ignore order).",
+        "assert their ids match private_data.to_delete_voice_message_ids (ignore order)."
+      ]
+    },
+    {
+      "id": "771d8fc_2",
+      "success": false,
+      "instruction": "All phone text messages and voice messages from 9294880327 are spam, delete them.",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.UserTextMessage, phone.UserVoiceMessage.",
+        "assert their ids match private_data.to_delete_text_message_ids (ignore order).",
+        "assert their ids match private_data.to_delete_voice_message_ids (ignore order)."
+      ]
+    },
+    {
+      "id": "771d8fc_3",
+      "success": false,
+      "instruction": "All phone text messages and voice messages from 5708520672 are spam, delete them.",
+      "num_tests": 6,
+      "passes": 2,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match phone.UserTextMessage, phone.UserVoiceMessage.",
+        "assert their ids match private_data.to_delete_text_message_ids (ignore order).",
+        "assert their ids match private_data.to_delete_voice_message_ids (ignore order)."
+      ]
+    },
+    {
+      "id": "7d7fbf6_1",
+      "success": false,
+      "instruction": "The \"~/photographs/\" directory in my file system has photo files organized in sub-directories for each vacation spot. Compress them and save them in \"~/photographs/vacations/<vacation_spot>.zip\" for e",
+      "num_tests": 8,
+      "passes": 3,
+      "failures": 5,
+      "failure_details": [
+        "assert model changes match file_system.Directory, file_system.File.",
+        "assert all added files have paths that match private_data.compressed_file_paths (ignoring order).",
+        "assert all removed files have paths that match keys of\nprivate_data.decompressed_file_path_to_content (ignoring order).",
+        "assert path to content mapping of removed files match private_data.decompressed_file_path_to_content.",
+        "assert all removed file_system.Directory records have tilde_paths that match\nprivate_data.decompressed_directory_paths (ignoring order)."
+      ]
+    },
+    {
+      "id": "7d7fbf6_2",
+      "success": false,
+      "instruction": "The \"~/photos/\" directory in my file system has photo files organized in sub-directories for each vacation spot. Compress them and save them in \"~/photos/vacations/<vacation_spot>.tar\" for each vacati",
+      "num_tests": 8,
+      "passes": 2,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match file_system.Directory, file_system.File.",
+        "assert all added files have paths that match private_data.compressed_file_paths (ignoring order).",
+        "assert all removed files have paths that match keys of\nprivate_data.decompressed_file_path_to_content (ignoring order).",
+        "assert path to content mapping of removed files match private_data.decompressed_file_path_to_content.",
+        "assert all removed file_system.Directory records have tilde_paths that match\nprivate_data.decompressed_directory_paths (ignoring order)."
+      ]
+    },
+    {
+      "id": "7d7fbf6_3",
+      "success": false,
+      "instruction": "The \"~/pictures/\" directory in my file system has photo files organized in sub-directories for each vacation spot. Compress them and save them in \"~/pictures/vacations/<vacation_spot>.zip\" for each va",
+      "num_tests": 8,
+      "passes": 2,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match file_system.Directory, file_system.File.",
+        "assert all added files have paths that match private_data.compressed_file_paths (ignoring order).",
+        "assert all removed files have paths that match keys of\nprivate_data.decompressed_file_path_to_content (ignoring order).",
+        "assert path to content mapping of removed files match private_data.decompressed_file_path_to_content.",
+        "assert all removed file_system.Directory records have tilde_paths that match\nprivate_data.decompressed_directory_paths (ignoring order)."
+      ]
+    },
+    {
+      "id": "82e2fac_1",
+      "success": false,
+      "instruction": "What is the title of the most-liked song in my Spotify playlists.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "82e2fac_2",
+      "success": false,
+      "instruction": "What is the title of the least-played song in my Spotify song library.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "82e2fac_3",
+      "success": false,
+      "instruction": "",
+      "num_tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "failure_details": [
+        "'_freeze_time' object has no attribute 'fake_names'"
+      ]
+    },
+    {
+      "id": "aa8502b_1",
+      "success": false,
+      "instruction": "Follow all the artists who have sung at least one song I have liked on Spotify.",
+      "num_tests": 4,
+      "passes": 2,
+      "failures": 2,
+      "failure_details": [
+        "assert model changes match spotify.UserArtistFollowing.",
+        "if public_data.action is \"Follow\",\nassert IDs of added artist followings match private_data.to_be_acted_upon_artist_ids (ignore_order),\nif public_data.action is \"Unfollow\",\nassert IDs of removed artist followings match private_data.to_be_acted_upon_artist_ids (ignore_order)."
+      ]
+    },
+    {
+      "id": "aa8502b_2",
+      "success": false,
+      "instruction": "Unfollow all the artists who have not sung even a single song I have liked on Spotify.",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserArtistFollowing.",
+        "if public_data.action is \"Follow\",\nassert IDs of added artist followings match private_data.to_be_acted_upon_artist_ids (ignore_order),\nif public_data.action is \"Unfollow\",\nassert IDs of removed artist followings match private_data.to_be_acted_upon_artist_ids (ignore_order)."
+      ]
+    },
+    {
+      "id": "aa8502b_3",
+      "success": false,
+      "instruction": "Follow all the artists who have sung at least one song I have liked on Spotify.",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserArtistFollowing.",
+        "if public_data.action is \"Follow\",\nassert IDs of added artist followings match private_data.to_be_acted_upon_artist_ids (ignore_order),\nif public_data.action is \"Unfollow\",\nassert IDs of removed artist followings match private_data.to_be_acted_upon_artist_ids (ignore_order)."
+      ]
+    },
+    {
+      "id": "afc0fce_1",
+      "success": false,
+      "instruction": "Add a comment, \"Thank you!\", to all the venmo payments I received from my coworkers in the last 5 days (including today), and like those payments.",
+      "num_tests": 9,
+      "passes": 3,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike, venmo.TransactionComment",
+        "assert updated transactions have only changed in like_count field using models.changed_field_names.",
+        "assert transaction_ids of added transaction likes match exactly to\nprivate_data.after_threshold_contact_transaction_ids (ignore order).",
+        "assert set of transaction_ids of added transaction comments match exactly\nto private_data.after_threshold_contact_transaction_ids (ignore order).",
+        "assert all added transaction comments have comment public_data.comment (normalize_text=True)"
+      ]
+    },
+    {
+      "id": "afc0fce_2",
+      "success": false,
+      "instruction": "Add a comment, \"Thanks!\", to all the venmo payments I received from my friends in the last 7 days (including today), and like those payments.",
+      "num_tests": 9,
+      "passes": 3,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike, venmo.TransactionComment",
+        "assert updated transactions have only changed in like_count field using models.changed_field_names.",
+        "assert transaction_ids of added transaction likes match exactly to\nprivate_data.after_threshold_contact_transaction_ids (ignore order).",
+        "assert set of transaction_ids of added transaction comments match exactly\nto private_data.after_threshold_contact_transaction_ids (ignore order).",
+        "assert all added transaction comments have comment public_data.comment (normalize_text=True)"
+      ]
+    },
+    {
+      "id": "afc0fce_3",
+      "success": false,
+      "instruction": "Add a comment, \"Thank you so much!\", to all the venmo payments I received from my roommates in the last 10 days (including today), and like those payments.",
+      "num_tests": 9,
+      "passes": 3,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match venmo.Transaction, venmo.TransactionLike, venmo.TransactionComment",
+        "assert updated transactions have only changed in like_count field using models.changed_field_names.",
+        "assert transaction_ids of added transaction likes match exactly to\nprivate_data.after_threshold_contact_transaction_ids (ignore order).",
+        "assert set of transaction_ids of added transaction comments match exactly\nto private_data.after_threshold_contact_transaction_ids (ignore order).",
+        "assert all added transaction comments have comment public_data.comment (normalize_text=True)"
+      ]
+    },
+    {
+      "id": "b0a8eae_1",
+      "success": false,
+      "instruction": "Start playing a playlist on Spotify that has enough songs for my workout today. I do not want to have to change the playlist in the middle of my workout. The workout plan is in Simple Note.",
+      "num_tests": 5,
+      "passes": 0,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.MusicPlayer.",
+        "assert music_player in the end state is in the playing state.",
+        "assert the music_player's queue_songs' total duration in the end state\nis >= data.private.workout_duration_mins.",
+        "assert the set music_player's queue_songs' song_ids in the end state\nmatch set of private_data.long_enough_playlist_song_ids."
+      ]
+    },
+    {
+      "id": "b0a8eae_2",
+      "success": false,
+      "instruction": "Start playing a playlist on Spotify that has enough songs for my workout today. I do not want to have to change the playlist in the middle of my workout. The workout plan is in Simple Note.",
+      "num_tests": 5,
+      "passes": 0,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.MusicPlayer.",
+        "assert music_player in the end state is in the playing state.",
+        "assert the music_player's queue_songs' total duration in the end state\nis >= data.private.workout_duration_mins.",
+        "assert the set music_player's queue_songs' song_ids in the end state\nmatch set of private_data.long_enough_playlist_song_ids."
+      ]
+    },
+    {
+      "id": "b0a8eae_3",
+      "success": false,
+      "instruction": "Start playing a playlist on Spotify that has enough songs for my workout today. I do not want to have to change the playlist in the middle of my workout. The workout plan is in Simple Note.",
+      "num_tests": 5,
+      "passes": 0,
+      "failures": 5,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.MusicPlayer.",
+        "assert music_player in the end state is in the playing state.",
+        "assert the music_player's queue_songs' total duration in the end state\nis >= data.private.workout_duration_mins.",
+        "assert the set music_player's queue_songs' song_ids in the end state\nmatch set of private_data.long_enough_playlist_song_ids."
+      ]
+    },
+    {
+      "id": "b7a9ee9_1",
+      "success": false,
+      "instruction": "Follow all artists of all classical-genre songs in any of my playlists on Spotify.",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserArtistFollowing.",
+        "assert artist_ids of the added artist followings match private_data.to_be_followed_artist_ids."
+      ]
+    },
+    {
+      "id": "b7a9ee9_2",
+      "success": false,
+      "instruction": "Follow all artists of all reggae-genre songs in any of my playlists on Spotify.",
+      "num_tests": 4,
+      "passes": 1,
+      "failures": 3,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserArtistFollowing.",
+        "assert artist_ids of the added artist followings match private_data.to_be_followed_artist_ids."
+      ]
+    },
+    {
+      "id": "b7a9ee9_3",
+      "success": false,
+      "instruction": "",
+      "num_tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "failure_details": [
+        "'_freeze_time' object has no attribute 'fake_names'"
+      ]
+    },
+    {
+      "id": "c901732_1",
+      "success": false,
+      "instruction": "Play the least listened to song on Spotify from the Echo Chamber Chronicles album.",
+      "num_tests": 6,
+      "passes": 0,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.MusicPlayer.",
+        "obtain added, updated, removed spotify.MusicPlayer records using models.changed_records,\nand assert 1 has been updated, and 0 have been added or removed.",
+        "assert the updated music player is in playing state.",
+        "assert the updated music player's current_song is part of album/playlist with private_data.collection_id.",
+        "assert the updated music player's current_song has id matching private_data.least_or_most_played_song_id."
+      ]
+    },
+    {
+      "id": "c901732_2",
+      "success": false,
+      "instruction": "Play the most listened to song on Spotify from my Woodstock Reimagined: Festival Vibes playlist.",
+      "num_tests": 6,
+      "passes": 0,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.MusicPlayer.",
+        "obtain added, updated, removed spotify.MusicPlayer records using models.changed_records,\nand assert 1 has been updated, and 0 have been added or removed.",
+        "assert the updated music player is in playing state.",
+        "assert the updated music player's current_song is part of album/playlist with private_data.collection_id.",
+        "assert the updated music player's current_song has id matching private_data.least_or_most_played_song_id."
+      ]
+    },
+    {
+      "id": "c901732_3",
+      "success": false,
+      "instruction": "Play the most listened to song on Spotify from the Velvet Underground album.",
+      "num_tests": 6,
+      "passes": 0,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.MusicPlayer.",
+        "obtain added, updated, removed spotify.MusicPlayer records using models.changed_records,\nand assert 1 has been updated, and 0 have been added or removed.",
+        "assert the updated music player is in playing state.",
+        "assert the updated music player's current_song is part of album/playlist with private_data.collection_id.",
+        "assert the updated music player's current_song has id matching private_data.least_or_most_played_song_id."
+      ]
+    },
+    {
+      "id": "ccb4494_1",
+      "success": false,
+      "instruction": "Like all the songs played so far in my spotify music player queue, including the current one.",
+      "num_tests": 5,
+      "passes": 1,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.SongLike.",
+        "assert all song_ids from the added song likes are in private_data.song_ids_in_queue.",
+        "assert song_ids from the added song likes match the private_data.song_ids_to_like (ignore order)."
+      ]
+    },
+    {
+      "id": "ccb4494_2",
+      "success": false,
+      "instruction": "Like all the songs played so far in my spotify music player queue, including the current one.",
+      "num_tests": 5,
+      "passes": 1,
+      "failures": 4,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.SongLike.",
+        "assert all song_ids from the added song likes are in private_data.song_ids_in_queue.",
+        "assert song_ids from the added song likes match the private_data.song_ids_to_like (ignore order)."
+      ]
+    },
+    {
+      "id": "ccb4494_3",
+      "success": false,
+      "instruction": "Like all the songs played so far in my spotify music player queue, including the current one.",
+      "num_tests": 5,
+      "passes": 2,
+      "failures": 3,
+      "failure_details": [
+        "assert model changes match spotify.SongLike.",
+        "assert all song_ids from the added song likes are in private_data.song_ids_in_queue.",
+        "assert song_ids from the added song likes match the private_data.song_ids_to_like (ignore order)."
+      ]
+    },
+    {
+      "id": "ce359b5_1",
+      "success": false,
+      "instruction": "Remove all songs from my Spotify song library and playlists that were released before 2021 year.",
+      "num_tests": 8,
+      "passes": 2,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserLibrarySong, spotify.PlaylistSong.",
+        "assert song_ids of the removed library songs match private_data.to_delete_library_song_link_ids.",
+        "assert id of the removed playlist_songs match private_data.to_delete_playlist_song_link_ids.",
+        "if public_data.before_after is \"after\",\nassert all songs in song library are released on or before public_data.year, in the end state.\nif public_data.before_after is \"before\",\nassert all songs in song library are released on or after public_data.year, in the end state.\nif public_data.before_after is \"in or after\",\nassert all songs in song library are released on before public_data.year, in the end state.\nif public_data.before_after is \"in or before\",\nassert all songs in song library are released on after public_data.year, in the end state.",
+        "if public_data.before_after is \"after\",\nassert all songs in playlists are released on or before public_data.year, in the end state.\nif public_data.before_after is \"before\",\nassert all songs in playlists are released on or after public_data.year, in the end state.\nif public_data.before_after is \"in or after\",\nassert all songs in playlists are released on before public_data.year, in the end state.\nif public_data.before_after is \"in or before\",\nassert all songs in playlists are released on after public_data.year, in the end state."
+      ]
+    },
+    {
+      "id": "ce359b5_2",
+      "success": false,
+      "instruction": "Remove all songs from my Spotify song library and playlists that were released after 2021 year.",
+      "num_tests": 8,
+      "passes": 2,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserLibrarySong, spotify.PlaylistSong.",
+        "assert song_ids of the removed library songs match private_data.to_delete_library_song_link_ids.",
+        "assert id of the removed playlist_songs match private_data.to_delete_playlist_song_link_ids.",
+        "if public_data.before_after is \"after\",\nassert all songs in song library are released on or before public_data.year, in the end state.\nif public_data.before_after is \"before\",\nassert all songs in song library are released on or after public_data.year, in the end state.\nif public_data.before_after is \"in or after\",\nassert all songs in song library are released on before public_data.year, in the end state.\nif public_data.before_after is \"in or before\",\nassert all songs in song library are released on after public_data.year, in the end state.",
+        "if public_data.before_after is \"after\",\nassert all songs in playlists are released on or before public_data.year, in the end state.\nif public_data.before_after is \"before\",\nassert all songs in playlists are released on or after public_data.year, in the end state.\nif public_data.before_after is \"in or after\",\nassert all songs in playlists are released on before public_data.year, in the end state.\nif public_data.before_after is \"in or before\",\nassert all songs in playlists are released on after public_data.year, in the end state."
+      ]
+    },
+    {
+      "id": "ce359b5_3",
+      "success": false,
+      "instruction": "Remove all songs from my Spotify song library and playlists that were released in or before 2021 year.",
+      "num_tests": 8,
+      "passes": 2,
+      "failures": 6,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.UserLibrarySong, spotify.PlaylistSong.",
+        "assert song_ids of the removed library songs match private_data.to_delete_library_song_link_ids.",
+        "assert id of the removed playlist_songs match private_data.to_delete_playlist_song_link_ids.",
+        "if public_data.before_after is \"after\",\nassert all songs in song library are released on or before public_data.year, in the end state.\nif public_data.before_after is \"before\",\nassert all songs in song library are released on or after public_data.year, in the end state.\nif public_data.before_after is \"in or after\",\nassert all songs in song library are released on before public_data.year, in the end state.\nif public_data.before_after is \"in or before\",\nassert all songs in song library are released on after public_data.year, in the end state.",
+        "if public_data.before_after is \"after\",\nassert all songs in playlists are released on or before public_data.year, in the end state.\nif public_data.before_after is \"before\",\nassert all songs in playlists are released on or after public_data.year, in the end state.\nif public_data.before_after is \"in or after\",\nassert all songs in playlists are released on before public_data.year, in the end state.\nif public_data.before_after is \"in or before\",\nassert all songs in playlists are released on after public_data.year, in the end state."
+      ]
+    },
+    {
+      "id": "cf6abd2_1",
+      "success": false,
+      "instruction": "Mark \"Learning to cook a signature dish from scratch\" in my Bucket List Simple Note as done.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match simple_note.Note.",
+        "assert exactly 1 simple_note.Note was updated.",
+        "assert the updated note's id matches data.private.note_id.",
+        "assert the updated note's content first line after stripping matches data.private.note_header_line.",
+        "assert the updated note's content rest of the lines after stripping\nmatches data.private.note_body_lines (normalize_text=True).",
+        "obtained changed_field_names of the updated note and assure none of them are in\n[\"title\", \"tags\", \"pinned\"]."
+      ]
+    },
+    {
+      "id": "cf6abd2_2",
+      "success": false,
+      "instruction": "Mark \"Taking a solo backpacking trip\" in my Bucket List Simple Note as not done.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match simple_note.Note.",
+        "assert exactly 1 simple_note.Note was updated.",
+        "assert the updated note's id matches data.private.note_id.",
+        "assert the updated note's content first line after stripping matches data.private.note_header_line.",
+        "assert the updated note's content rest of the lines after stripping\nmatches data.private.note_body_lines (normalize_text=True).",
+        "obtained changed_field_names of the updated note and assure none of them are in\n[\"title\", \"tags\", \"pinned\"]."
+      ]
+    },
+    {
+      "id": "cf6abd2_3",
+      "success": false,
+      "instruction": "Mark \"Witnessing a total solar eclipse\" in my Bucket List Simple Note as done.",
+      "num_tests": 8,
+      "passes": 1,
+      "failures": 7,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match simple_note.Note.",
+        "assert exactly 1 simple_note.Note was updated.",
+        "assert the updated note's id matches data.private.note_id.",
+        "assert the updated note's content first line after stripping matches data.private.note_header_line.",
+        "assert the updated note's content rest of the lines after stripping\nmatches data.private.note_body_lines (normalize_text=True).",
+        "obtained changed_field_names of the updated note and assure none of them are in\n[\"title\", \"tags\", \"pinned\"]."
+      ]
+    },
+    {
+      "id": "d0b1f43_1",
+      "success": false,
+      "instruction": "How much money have I sent to my roommates on venmo since 1st Jan of this year?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "d0b1f43_2",
+      "success": false,
+      "instruction": "How much money have I received to my coworkers on venmo since 1st Feb of this year?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "d0b1f43_3",
+      "success": false,
+      "instruction": "How much money have I sent or received to my roommates on venmo since 1st Mar of this year?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "e3d6c94_1",
+      "success": false,
+      "instruction": "Add all spotify-recommended classical songs released in this year to a new \"Spotify Recommended Songs\" playlist.",
+      "num_tests": 9,
+      "passes": 1,
+      "failures": 8,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.Playlist, spotify.PlaylistSong.",
+        "obtain added, updated, removed spotify.Playlist records using models.changed_records,\nand assert 1 has been added, and 0 have been updated or removed.",
+        "assert the added playlist is titled public_data.playlist_title (normalize_text=True)",
+        "assert all added playlist.songs are in private_data.recent_song_ids.",
+        "assert all added playlist.songs are in private_data.genre_song_ids.",
+        "assert all song_ids of added playlist.songs match private_data.playlist_song_ids.",
+        "assert all added_playlist_songs have playlist_id == added_playlist.id."
+      ]
+    },
+    {
+      "id": "e3d6c94_2",
+      "success": false,
+      "instruction": "Add all spotify-recommended R&B songs released in this or last year to a new \"Spotify R&B Recommendations\" playlist.",
+      "num_tests": 9,
+      "passes": 1,
+      "failures": 8,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.Playlist, spotify.PlaylistSong.",
+        "obtain added, updated, removed spotify.Playlist records using models.changed_records,\nand assert 1 has been added, and 0 have been updated or removed.",
+        "assert the added playlist is titled public_data.playlist_title (normalize_text=True)",
+        "assert all added playlist.songs are in private_data.recent_song_ids.",
+        "assert all added playlist.songs are in private_data.genre_song_ids.",
+        "assert all song_ids of added playlist.songs match private_data.playlist_song_ids.",
+        "assert all added_playlist_songs have playlist_id == added_playlist.id."
+      ]
+    },
+    {
+      "id": "e3d6c94_3",
+      "success": false,
+      "instruction": "Add all spotify-recommended R&B songs released in this year to a new \"R&B Recommendation\" playlist.",
+      "num_tests": 9,
+      "passes": 1,
+      "failures": 8,
+      "failure_details": [
+        "assert answers match.",
+        "assert model changes match spotify.Playlist, spotify.PlaylistSong.",
+        "obtain added, updated, removed spotify.Playlist records using models.changed_records,\nand assert 1 has been added, and 0 have been updated or removed.",
+        "assert the added playlist is titled public_data.playlist_title (normalize_text=True)",
+        "assert all added playlist.songs are in private_data.recent_song_ids.",
+        "assert all added playlist.songs are in private_data.genre_song_ids.",
+        "assert all song_ids of added playlist.songs match private_data.playlist_song_ids.",
+        "assert all added_playlist_songs have playlist_id == added_playlist.id."
+      ]
+    },
+    {
+      "id": "e7a10f8_1",
+      "success": false,
+      "instruction": "How long is my longest Spotify playlist, in minutes, rounded to the nearest number?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "e7a10f8_2",
+      "success": false,
+      "instruction": "How long is my shortest Spotify playlist, in minutes, rounded to the nearest number?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "e7a10f8_3",
+      "success": false,
+      "instruction": "How long is my longest Spotify playlist, in minutes, rounded to the nearest number?",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "e85d92a_1",
+      "success": false,
+      "instruction": "What is the title of the most played song by Velvet Echo on Spotify.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "e85d92a_2",
+      "success": false,
+      "instruction": "What is the title of the least played song by Zoey James on Spotify.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    },
+    {
+      "id": "e85d92a_3",
+      "success": false,
+      "instruction": "What is the title of the most played song by Jasper Skye on Spotify.",
+      "num_tests": 2,
+      "passes": 1,
+      "failures": 1,
+      "failure_details": [
+        "assert answers match."
+      ]
+    }
+  ]
+}

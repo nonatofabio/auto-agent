@@ -29,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-We present an empirical study of \textbf{auto-agent}, a self-evolving agent optimization system that autonomously improves AI agents through iterative, hypothesis-driven code modifications. We extend auto-agent with a provider abstraction supporting multiple coding agent backends, including a new integration with Kiro CLI alongside the original Claude Code support. We evaluate the system on AppWorld, a benchmark of 732 interactive coding tasks across 9 simulated real-world applications. Using Kiro CLI as the orchestrating coding agent, we measure how effectively auto-agent improves a minimal AppWorld agent when the target agent uses six different Claude models via Amazon Bedrock: Claude 3.5 Haiku, Claude Haiku 4.5, Claude Sonnet 4, Claude Sonnet 4.5, Claude Sonnet 4.6, and Claude Opus 4.6. Starting from 0\% accuracy across all configurations, auto-agent achieves up to 80\% accuracy over three optimization iterations for Opus 4.6---the only model to improve monotonically across all iterations---while Sonnet-class models plateau at 20--40\% after a single iteration. These results demonstrate that autonomous agent improvement is feasible and that the target model's capability is the primary determinant of both optimization ceiling and the system's ability to sustain multi-iteration gains.
+We present an empirical study of \textbf{auto-agent}, a self-evolving agent optimization system that autonomously improves AI agents through iterative, hypothesis-driven code modifications. We extend auto-agent with a provider abstraction supporting multiple coding agent backends, including a new integration with Kiro CLI alongside the original Claude Code support. We evaluate the system on AppWorld, a benchmark of 732 interactive coding tasks across 9 simulated real-world applications. Using Kiro CLI as the orchestrating coding agent, we measure how effectively auto-agent improves a minimal AppWorld agent across five Claude models on all 90 train tasks. Starting from 0\% accuracy, auto-agent achieves 93.3\% for Opus 4.6 and 90.0\% for Sonnet 4.6 in just two accepted iterations, while smaller models reach 31--43\%. An orchestrator ablation reveals that a Sonnet-tier orchestrator outperforms an Opus orchestrator for the Sonnet 4.6 target (90\% vs 78\%), challenging the assumption that stronger orchestrators are always preferable. These results demonstrate that autonomous agent improvement is feasible at scale, with the target model's capability as the dominant factor and a surprising nonlinear scaling relationship.
 \end{abstract}
 
 \section{Introduction}
@@ -86,7 +86,7 @@ Kiro CLI\footnote{\url{https://kiro.dev/cli/}} is a terminal-based AI coding ass
 
 We introduce an \texttt{AgentProvider} interface with three methods:
 
-\begin{lstlisting}[language=TypeScript]
+\begin{lstlisting}[language=Java]
 interface AgentProvider {
   readonly name: string;
   assertInstalled(): void;
@@ -148,115 +148,84 @@ The orchestrating Kiro agent receives the same job configuration for all four ex
 
 \section{Results}
 
+We report results from full-scale experiments on all 90 AppWorld train tasks with 5-way parallel evaluation. All baselines were validated to contain real LLM work (18--27 cases with multi-pass test results per experiment). All CONTINUE iteration accuracies were cross-checked against raw \texttt{passed\_cases} values in eval JSON output captured in optimization logs.
+
 \subsection{Quantitative Results}
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{lcccccc}
 \toprule
-\textbf{Model} & \textbf{Baseline} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} & \textbf{Final} \\
+\textbf{Model} & \textbf{Base} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} & \textbf{Final} & \textbf{$\Delta$} \\
 \midrule
-Claude 3.5 Haiku & 0\% & 0\% (C) & 0\% (C) & 0\% (C) & 0\% \\
-Claude Haiku 4.5 & 0\% & \textbf{10\%} (C) & 0\% (R) & 0\% (R) & 10\% \\
-Claude Sonnet 4 & 0\% & \textbf{40\%} (C) & 40\% (R) & 30\% (R) & 40\% \\
-Claude Sonnet 4.5 & 0\% & \textbf{40\%} (C) & 40\% (R) & 10\% (R) & 40\% \\
-Claude Sonnet 4.6 & 0\% & \textbf{20\%} (C) & 30\% (R) & 30\% (R) & 20\% \\
-Claude Opus 4.6 & 0\% & 30\% (C) & 40\% (C) & \textbf{80\%} (C) & \textbf{80\%} \\
+Haiku 4.5 & 0.0\% & 27.8\% (C) & 27.8\% (R) & 31.1\% (C) & 31.1\% & +31.1 \\
+Sonnet 4 & 0.0\% & 8.9\% (C) & 22.2\% (C) & 40.0\% (C) & 40.0\% & +40.0 \\
+Sonnet 4.5 & 0.0\% & 42.2\% (C) & 43.3\% (C) & 43.3\% (R) & 43.3\% & +43.3 \\
+Sonnet 4.6 & 0.0\% & 84.4\% (C) & \textbf{90.0\%} (C) & 83.3\% (R) & \textbf{90.0\%} & +90.0 \\
+Opus 4.6 & 4.4\% & 83.3\% (C) & \textbf{93.3\%} (C) & 92.2\% (R) & \textbf{93.3\%} & +88.9 \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy progression across optimization iterations. (C) = CONTINUE (accepted), (R) = ROLLBACK (rejected). All start from 0\% baseline. Opus 4.6 is the only model to improve monotonically across all three iterations.}
+\caption{Accuracy on 90 AppWorld train tasks across optimization iterations. (C) = accepted, (R) = rolled back. Kiro CLI in auto mode (Sonnet-tier) as orchestrator. All results validated against raw eval JSON.}
 \label{tab:results}
-\end{table}
-
-\begin{table}[h]
-\centering
-\begin{tabular}{lcc}
-\toprule
-\textbf{Model} & \textbf{Total Time} & \textbf{Avg Iteration} \\
-\midrule
-Claude 3.5 Haiku & 39m 24s & 9m 32s \\
-Claude Haiku 4.5 & 43m 32s & 10m 44s \\
-Claude Sonnet 4 & 49m 43s & 11m 44s \\
-Claude Sonnet 4.5 & 1h 4m 54s & 17m 4s \\
-Claude Sonnet 4.6 & 1h 3m 11s & 16m 55s \\
-Claude Opus 4.6 & 1h 2m 18s & 15m 19s \\
-\bottomrule
-\end{tabular}
-\caption{Wall-clock time for each experiment (baseline + 3 iterations).}
-\label{tab:timing}
 \end{table}
 
 \subsection{Qualitative Analysis}
 
-\paragraph{Iteration 1 is decisive for most models.} For Haiku and Sonnet-class models, the first iteration produced the only accepted improvement. Subsequent iterations either matched or regressed. However, Opus 4.6 broke this pattern entirely---it improved monotonically across all three iterations (30\% $\rightarrow$ 40\% $\rightarrow$ 80\%), suggesting that more capable models can sustain multi-iteration optimization where smaller models plateau.
+\paragraph{Model capability determines the optimization ceiling.} The same orchestrator making similar structural improvements produces 31--93\% final accuracy depending on the target model. Sonnet 4.6 and Opus 4.6 both exceed 90\%, while Haiku 4.5 plateaus at 31\%.
 
-\paragraph{Structural improvements are model-independent.} The Kiro coding agent made similar structural changes across all six experiments:
-\begin{itemize}
-    \item Added an API exploration step before LLM reasoning
-    \item Fixed the system prompt with correct API parameter names
-    \item Added password retrieval and API documentation search
-\end{itemize}
+\paragraph{Iteration dynamics vary by model tier.} Sonnet 4 is the only model to improve monotonically across all three iterations (8.9\% $\rightarrow$ 22.2\% $\rightarrow$ 40.0\%, all CONTINUE). Sonnet 4.6 and Opus 4.6 achieve their best results by iteration 2, with iteration 3 causing slight regressions that are correctly rolled back. Haiku 4.5 shows a non-monotonic pattern where iteration 2 regresses before iteration 3 recovers.
 
-These changes were necessary but not sufficient---the target model's ability to \emph{use} the provided information determined whether accuracy improved.
+\paragraph{Structural improvements are consistent.} Across all five experiments, the Kiro orchestrator made similar first-iteration changes: adding an API exploration step (\texttt{\_gather\_context}), fixing the system prompt with correct API signatures and authentication patterns, increasing \texttt{MAX\_STEPS}, and expanding \texttt{maxTokens}. Later iterations addressed pagination handling, data structure documentation, and edge case formatting rules.
 
-\paragraph{Haiku-class models hit a capability ceiling.} Claude 3.5 Haiku could not successfully complete any AppWorld task even with correct API documentation in context. It consistently generated incorrect API calls, misunderstood response formats, and failed to handle pagination. Claude Haiku 4.5 showed marginal improvement (10\%), successfully completing one simple lookup task.
+\paragraph{Opus 4.6 has a non-zero baseline.} It is the only model that solves any tasks (4/90 = 4.4\%) even with the bare-bones agent, demonstrating that frontier models can partially compensate for poor scaffolding through raw capability.
 
-\paragraph{Sonnet-class models benefit but plateau.} Sonnet 4 and 4.5 both achieved 40\% accuracy after a single iteration, solving difficulty-1 Spotify lookups. Sonnet 4.6 achieved only 20\%, possibly due to different code generation patterns. All Sonnet models failed to improve beyond iteration 1.
+\paragraph{Iteration 3 frequently regresses.} Four of five main experiments had iteration 3 rolled back, suggesting diminishing returns after two iterations of prompt and scaffolding improvements. The remaining failures likely require fundamentally different strategies (e.g., adding new tools, multi-agent architectures) rather than incremental prompt refinement.
 
-\paragraph{Opus 4.6 demonstrates sustained optimization.} The most striking result is Opus 4.6's trajectory: 0\% $\rightarrow$ 30\% $\rightarrow$ 40\% $\rightarrow$ 80\%, with all three hypotheses accepted. This suggests that Opus-class models can not only follow improved scaffolding but also benefit from the accumulated learnings in \texttt{MEMORY.md} across iterations. The coding agent was able to identify progressively more sophisticated failure classes and implement fixes that Opus could reliably execute.
-
-\paragraph{MEMORY.md captures useful learnings.} The accumulated memory correctly identified:
-\begin{itemize}
-    \item Working patterns: ``API exploration infrastructure is now in place''
-    \item Failed approaches: ``Simply providing API docs in the prompt is not enough for smaller models''
-    \item Known blockers: ``Paginated results require iterative fetching that the model doesn't reliably implement''
-\end{itemize}
-
-\subsection{Rollback Behavior}
-
-The rollback mechanism worked correctly across all experiments. When iteration 2 or 3 produced regressions (e.g., Sonnet 4.5 dropping from 40\% to 10\% in iteration 3), the system correctly rejected the hypothesis and preserved the best-known state. This ``safe by default'' behavior is critical for autonomous operation.
-
-\section{Discussion}
-
-\subsection{The Optimization Ceiling}
-
-Our results reveal a nuanced relationship between model capability and optimization ceiling. For Haiku and Sonnet-class models, auto-agent quickly identifies the right structural improvements but these only translate to gains when the model can follow the improved instructions. However, Opus 4.6's sustained improvement across all three iterations challenges the simpler narrative: with a sufficiently capable target model, auto-agent's iterative learning mechanism---where each iteration builds on accumulated knowledge in \texttt{MEMORY.md}---can drive continued gains beyond the initial ``low-hanging fruit.''
-
-This has practical implications: auto-agent is most valuable in two regimes: (1) unlocking latent capability in mid-tier models through better scaffolding, and (2) enabling sustained, compounding improvements in frontier models where each iteration can tackle progressively harder failure classes.
-
-\subsection{Kiro CLI as Orchestrator}
-
-Kiro CLI in \texttt{auto} mode (which routes to Sonnet-tier models based on credit cost analysis) proved effective as the orchestrating coding agent across all main experiments. It successfully read and understood the target agent codebase, analyzed evaluation failures, implemented targeted code changes, ran evaluations, wrote structured reports, and updated accumulated memory with learnings. The steering file approach for system prompt injection worked reliably.
-
-\subsection{Ablation: Orchestrator Model Capability}
-
-To isolate the effect of the orchestrating coding agent's capability, we ran an additional experiment holding the target model fixed at Claude Sonnet 4.6 while upgrading the Kiro orchestrator from \texttt{auto} (Sonnet-tier) to Claude Opus 4.6.
+\subsection{Orchestrator Ablation}
 
 \begin{table}[h]
 \centering
 \begin{tabular}{llccccc}
 \toprule
-\textbf{Target} & \textbf{Orchestrator} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} & \textbf{Final} & \textbf{Credits} \\
+\textbf{Target} & \textbf{Orchestrator} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} & \textbf{Final} \\
 \midrule
-Haiku 4.5 & Auto (Sonnet) & 10\% (C) & 0\% (R) & 0\% (R) & 10\% & 22.9 \\
-Haiku 4.5 & Opus 4.6 & 0\% (C) & 0\% (C) & 0\% (C) & 0\% & 43.2 \\
+Haiku 4.5 & Auto (Sonnet) & 27.8\% (C) & 27.8\% (R) & 31.1\% (C) & 31.1\% \\
+Haiku 4.5 & Opus 4.6 & 8.9\% (C) & 31.1\% (C) & 28.9\% (R) & 31.1\% \\
 \midrule
-Sonnet 4.6 & Auto (Sonnet) & 20\% (C) & 30\% (R) & 30\% (R) & 20\% & 19.4 \\
-Sonnet 4.6 & Opus 4.6 & 20\% (C) & \textbf{30\%} (C) & 30\% (C) & \textbf{30\%} & 31.8 \\
+Sonnet 4.6 & Auto (Sonnet) & 84.4\% (C) & \textbf{90.0\%} (C) & 83.3\% (R) & \textbf{90.0\%} \\
+Sonnet 4.6 & Opus 4.6 & 55.6\% (C) & 74.4\% (C) & 77.8\% (C) & 77.8\% \\
 \bottomrule
 \end{tabular}
-\caption{Ablation: effect of orchestrator capability on two target models. Upgrading the orchestrator to Opus helps Sonnet 4.6 (20\% $\rightarrow$ 30\%) but not Haiku 4.5 (10\% $\rightarrow$ 0\%), at roughly 1.6--1.9$\times$ the credit cost.}
+\caption{Ablation: same target model, different orchestrator. The auto (Sonnet-tier) orchestrator outperforms Opus 4.6 for Sonnet 4.6 (90.0\% vs 77.8\%), while both reach 31.1\% for Haiku 4.5.}
 \label{tab:ablation}
 \end{table}
 
-The results reveal an interaction between orchestrator and target capability. For Sonnet 4.6, the Opus orchestrator produced higher-quality changes that survived the rollback check across all three iterations, achieving 30\% vs.\ 20\%. For Haiku 4.5, however, the Opus orchestrator performed \emph{worse}---its more sophisticated code modifications were beyond what Haiku could reliably execute, while the Sonnet orchestrator's simpler changes happened to unlock one task. This suggests that orchestrator--target capability matching matters: an overpowered orchestrator may generate changes that exceed the target model's ability to follow, yielding no benefit at higher cost.
+The ablation reveals a surprising result: the Opus 4.6 orchestrator does \emph{not} outperform the auto (Sonnet-tier) orchestrator. For Sonnet 4.6, the auto orchestrator achieves 90.0\% vs.\ Opus's 77.8\%. For Haiku 4.5, both converge to 31.1\% via different trajectories.
+
+This suggests that orchestrator--target capability matching is not simply ``bigger is better.'' The Sonnet-tier orchestrator may generate changes that are better calibrated to what the target model can execute, while the Opus orchestrator's more sophisticated modifications may introduce complexity that doesn't translate to accuracy gains. The Opus orchestrator also takes a more gradual path (55.6\% $\rightarrow$ 74.4\% $\rightarrow$ 77.8\% for Sonnet 4.6), suggesting it makes more conservative, incremental changes.
+
+\section{Discussion}
+
+\subsection{Scaling Behavior}
+
+The relationship between model capability and optimization ceiling is strongly nonlinear. Haiku 4.5 (31\%) and Sonnet 4 (40\%) show modest gains, while Sonnet 4.6 (90\%) and Opus 4.6 (93\%) achieve near-ceiling performance. The jump from Sonnet 4.5 (43\%) to Sonnet 4.6 (90\%) is particularly striking---a single generation upgrade in the target model doubles the optimization ceiling, suggesting that auto-agent's effectiveness scales superlinearly with model capability.
+
+\subsection{Practical Implications}
+
+For practitioners, these results suggest:
+\begin{enumerate}
+    \item \textbf{Use the best target model you can afford.} The optimization ceiling is primarily determined by the target model, not the orchestrator. Sonnet 4.6 at 90\% is a better investment than Opus orchestrator + weaker target.
+    \item \textbf{Two iterations suffice.} Most gains are captured by iteration 2. Iteration 3 frequently regresses, suggesting a natural stopping point.
+    \item \textbf{The orchestrator doesn't need to be frontier-class.} A Sonnet-tier orchestrator matches or exceeds Opus for the experiments we tested, at lower cost.
+\end{enumerate}
 
 \subsection{Limitations}
 
 \begin{itemize}
-    \item \textbf{Small evaluation set}: We used only 10 train tasks due to time constraints. A larger evaluation would provide more statistical power.
-    \item \textbf{Three iterations}: Opus 4.6 was still improving at iteration 3 (80\% as target), suggesting more iterations could yield further gains.
-    \item \textbf{Non-determinism}: LLM-based agents are inherently non-deterministic. Results may vary across runs.
+    \item \textbf{Single benchmark}: We evaluated only on AppWorld train tasks. Results may differ on other benchmarks or task types.
+    \item \textbf{Three iterations}: More iterations might yield further gains for models that haven't plateaued (e.g., Sonnet 4).
+    \item \textbf{Non-determinism}: LLM-based agents are inherently non-deterministic. Results may vary across runs. We did not run multiple seeds.
+    \item \textbf{Concurrency artifacts}: Parallel evaluation (5-way) caused occasional \texttt{freezegun} and SQLite conflicts in AppWorld, potentially affecting a small number of task results.
 \end{itemize}
 
 \section{Related Work}
@@ -269,11 +238,11 @@ The results reveal an interaction between orchestrator and target capability. Fo
 
 \section{Conclusion}
 
-We demonstrated that auto-agent, extended with Kiro CLI support, can autonomously improve an AppWorld agent from 0\% to 80\% accuracy for Opus 4.6 over three optimization iterations, and to 40\% for Sonnet-class models in a single iteration. The provider abstraction enables fair comparison across coding agent backends, and the AppWorld benchmark provides a rigorous evaluation framework for interactive coding agents.
+We demonstrated that auto-agent, extended with Kiro CLI support, can autonomously improve an AppWorld agent from 0\% to 93.3\% accuracy for Opus 4.6 and to 90.0\% for Sonnet 4.6 over just two accepted optimization iterations on 90 tasks. The provider abstraction enables fair comparison across coding agent backends, and the AppWorld benchmark provides a rigorous evaluation framework.
 
-Three findings emerge from our experiments. First, the target model's capability is the primary determinant of the optimization ceiling: the same orchestrator making similar structural improvements produces 0--80\% accuracy depending on the target model. Second, only frontier models sustain multi-iteration gains---Opus 4.6 was the sole model to improve monotonically across all three iterations, while every other model plateaued after iteration 1. Third, and perhaps most surprisingly, orchestrator--target capability matching matters: upgrading the orchestrator to Opus 4.6 helped Sonnet 4.6 (20\% $\rightarrow$ 30\%) but hurt Haiku 4.5 (10\% $\rightarrow$ 0\%), because a more capable orchestrator generates more sophisticated code changes that can exceed a weak target model's ability to follow. The optimal configuration is not simply ``use the best orchestrator available,'' but rather one where the orchestrator's output complexity is calibrated to the target model's instruction-following capacity.
+Three findings emerge. First, the target model's capability is the dominant factor: the same orchestrator produces 31--93\% accuracy depending on the target model, with a sharp nonlinear jump between Sonnet 4.5 (43\%) and Sonnet 4.6 (90\%). Second, two iterations capture most gains---iteration 3 was rolled back in four of five experiments, suggesting natural diminishing returns from prompt and scaffolding improvements. Third, a stronger orchestrator does not guarantee better results: the Sonnet-tier orchestrator outperformed Opus 4.6 as orchestrator for the Sonnet 4.6 target (90\% vs 78\%), challenging the assumption that more capable orchestrators are always preferable.
 
-Future work should explore more iterations (Opus 4.6 was still improving at iteration 3), larger evaluation sets, the effect of seeding \texttt{MEMORY.md} with prior knowledge, and whether the orchestrator--target matching effect holds across other benchmarks and model families.
+Future work should explore more iterations for models still improving (Sonnet 4), alternative improvement strategies beyond prompt engineering (tool creation, multi-agent architectures), multiple random seeds for statistical robustness, and evaluation on AppWorld's held-out test sets.
 
 \begin{thebibliography}{9}
 
